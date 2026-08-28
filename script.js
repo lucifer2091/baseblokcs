@@ -36,6 +36,7 @@ const ICONS = {
   gear: '<circle cx="12" cy="12" r="3.6"/><path d="M12 3.5 v3 M12 17.5 v3 M3.5 12 h3 M17.5 12 h3 M6 6 l2 2 M16 16 l2 2 M18 6 l-2 2 M8 16 l-2 2"/>',
   box: '<path d="M4 8 L12 4 L20 8 V16 L12 20 L4 16 Z"/><path d="M4 8 L12 12 L20 8"/><path d="M12 12 V20"/>',
   sparkle: '<path d="M12 3 C13 9 15 11 21 12 C15 13 13 15 12 21 C11 15 9 13 3 12 C9 11 11 9 12 3 Z"/>',
+  trophy: '<path d="M6 5 H18 L17 12 H7 Z"/><path d="M6 7 H4 a4 4 0 0 0 4 6"/><path d="M18 7 H20 a4 4 0 0 1 -4 6"/><path d="M9 21 H15"/><path d="M12 13 V21"/>',
 };
 function iconSvg(key){
   const inner = ICONS[key];
@@ -63,6 +64,27 @@ const BLUEPRINT_SHOP = [
   { id:'bpBps', name:'Blueprint Engine', icon:'gear', desc:'+10% BPS per level', cost:2, costScale:1.75, type:'bpBpsMult', value:0.10, max:20 },
   { id:'bpDiscount', name:'Supply Chain', icon:'box', desc:'-3% building cost per level', cost:3, costScale:1.85, type:'bpDiscount', value:0.03, max:15 },
   { id:'bpGolden', name:'Golden Fortune', icon:'sparkle', desc:'+25% Golden Block reward', cost:5, costScale:2.05, type:'bpGolden', value:0.25, max:10 },
+];
+
+const ACHIEVEMENTS = [
+  { id:'firstClick', name:'First Block', desc:'Click the block once', icon:'hand', check:()=>state.clicks>=1 },
+  { id:'hundredClicks', name:'Click Frenzy', desc:'Reach 100 clicks', icon:'bolt', check:()=>state.clicks>=100 },
+  { id:'thousandClicks', name:'Click Storm', desc:'Reach 1,000 clicks', icon:'fist', check:()=>state.clicks>=1000 },
+  { id:'kBlocks', name:'Stacked', desc:'Own 1,000 blocks at once', icon:'box', check:()=>state.blocks>=1000 },
+  { id:'tenK', name:'Hoarder', desc:'Stack 10,000 total blocks', icon:'box', check:()=>state.totalEver>=10000 },
+  { id:'hundredK', name:'Magnate', desc:'Stack 100,000 total blocks', icon:'factory', check:()=>state.totalEver>=100000 },
+  { id:'million', name:'Millionaire', desc:'Stack 1,000,000 total blocks', icon:'forge', check:()=>state.totalEver>=1000000 },
+  { id:'tenBuildings', name:'Builder', desc:'Own 10 generators', icon:'gear', check:()=>Object.values(state.generators).reduce((a,b)=>a+b,0)>=10 },
+  { id:'fiftyBuildings', name:'Industrialist', desc:'Own 50 generators', icon:'gear', check:()=>Object.values(state.generators).reduce((a,b)=>a+b,0)>=50 },
+  { id:'tenBps', name:'Automation', desc:'Reach 10 BPS', icon:'gauge', check:()=>bps>=10 },
+  { id:'hundredBps', name:'Overdrive', desc:'Reach 100 BPS', icon:'gauge', check:()=>bps>=100 },
+  { id:'thousandBps', name:'Mega Factory', desc:'Reach 1,000 BPS', icon:'gauge', check:()=>bps>=1000 },
+  { id:'firstBP', name:'Blueprint Novice', desc:'Gain your first Blueprint', icon:'sparkle', check:()=>state.blueprints>=1 },
+  { id:'fiveBP', name:'Architect', desc:'Gain 5 Blueprints', icon:'trophy', check:()=>state.blueprints>=5 },
+  { id:'golden', name:'Golden Hunter', desc:'Catch a Golden Block', icon:'lens', check:()=>(state.stats?.goldenCaught||0)>=1 },
+  { id:'golden5', name:'Treasure Seeker', desc:'Catch 5 Golden Blocks', icon:'sparkle', check:()=>(state.stats?.goldenCaught||0)>=5 },
+  { id:'play10', name:'Dedicated', desc:'Play for 10 minutes', icon:'worker', check:()=>state.playTime>=600 },
+  { id:'crit', name:'Lucky Hit', desc:'Land a critical click', icon:'clover', check:()=>(state.stats?.crits||0)>=1 },
 ];
 
 const SAVE_KEY = 'baseblocks_save_v2';
@@ -103,6 +125,8 @@ const defaultState = () => ({
   generators:{},
   upgrades:{},
   blueprintLevels:{},
+  achievementsUnlocked:[],
+  stats:{ goldenCaught:0, crits:0 },
   settings:{ particles:true, shake:true, compact:true },
   lastSave:Date.now(),
   goldenBoostOwned:false,
@@ -147,6 +171,10 @@ const goldenBlock=document.getElementById('golden-block');
 const genList=document.getElementById('generators-list');
 const upgList=document.getElementById('upgrades-list');
 const bpShopDiv=document.getElementById('blueprint-shop');
+const achGrid=document.getElementById('achievements-grid');
+const achCount=document.getElementById('ach-count');
+const achFill=document.getElementById('ach-progress-fill');
+const achText=document.getElementById('ach-progress-text');
 const toastStack=document.getElementById('toast-stack');
 
 function load(){
@@ -160,6 +188,8 @@ function load(){
     state.upgrades = parsed.upgrades || {};
     state.blueprintLevels = parsed.blueprintLevels || {};
     state.settings = {...defaultState().settings, ...(parsed.settings||{})};
+    state.achievementsUnlocked = Array.isArray(parsed.achievementsUnlocked) ? parsed.achievementsUnlocked : [];
+    state.stats = { ...defaultState().stats, ...(parsed.stats||{}) };
     // offline progress
     const now=Date.now();
     const dt = Math.min((now - (state.lastSave||now))/1000, 24*3600);
@@ -329,6 +359,20 @@ function updateUI(){
 
   // shop highlights will be updated via renderShop? But we can do inline price color
   updateShopAffordability();
+
+  // achievements header progress (light, no full re-render)
+  if(achCount && achFill && achText){
+    const total = ACHIEVEMENTS.length;
+    const unlockedCount = state.achievementsUnlocked.length;
+    achCount.textContent = `${unlockedCount} / ${total}`;
+    const pct = total ? Math.round(unlockedCount/total*100) : 0;
+    achFill.style.width = pct + '%';
+    achText.textContent = pct + '%';
+  }
+  // also check for new unlocks periodically (throttled elsewhere)
+  // we run a lightweight check every UI update — cheap (18 checks)
+  // but only toast/save on new unlocks inside checkAchievements
+  if(Math.random() < 0.08) checkAchievements();
 }
 
 function getClickPowerBase(){
@@ -498,6 +542,9 @@ function doClick(e){
   state.totalEver += gain;
   state.clicks++;
   state.totalClicks++;
+  if(isCrit){
+    state.stats.crits = (state.stats.crits||0) + 1;
+  }
 
   // visual
   bigBlock.classList.remove('popping');
@@ -589,6 +636,7 @@ function buyGenerator(id){
   save();
   renderAllShops();
   updateUI();
+  checkAchievements();
   toast(`Built ${g.name}!`);
 }
 function buyUpgrade(id){
@@ -605,6 +653,7 @@ function buyUpgrade(id){
   save();
   renderAllShops();
   updateUI();
+  checkAchievements();
   toast(`Unlocked ${u.name}!`);
 }
 function buyBlueprint(id){
@@ -623,6 +672,7 @@ function buyBlueprint(id){
   save();
   renderAllShops();
   updateUI();
+  checkAchievements();
   toast(`${b.name} Lv ${lvl+1}!`);
 }
 function shakeBuy(){
@@ -647,6 +697,7 @@ function doPrestige(){
   save();
   renderAllShops();
   updateUI();
+  checkAchievements();
   toast(`REINFORCED! +${gain} Blueprints ◆`);
   // celebration particles
   for(let i=0;i<18;i++){
@@ -682,6 +733,7 @@ function spawnGolden(){
 goldenBlock.addEventListener('click', ()=>{
   goldenBlock.classList.add('hidden');
   if(goldenTimeout) clearTimeout(goldenTimeout);
+  state.stats.goldenCaught = (state.stats.goldenCaught||0) + 1;
   const reward = Math.max( Math.floor(state.blocks * 0.10 * state._goldenMult), Math.floor(bps*8+ 40) );
   // Also add bonus based on totalEver? ensures early game decent
   const final = Math.max(reward, 120);
@@ -690,6 +742,7 @@ goldenBlock.addEventListener('click', ()=>{
   recalc();
   updateUI();
   throttledRender();
+  checkAchievements();
   toast(`Golden Block! +${formatNum(final,true)} blocks ✦`);
   // burst particles
   for(let i=0;i<6;i++) spawnParticles(true);
@@ -723,6 +776,7 @@ document.querySelectorAll('.tab').forEach(tab=>{
     const id=tab.dataset.tab;
     document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('active'));
     document.getElementById('pane-'+id).classList.add('active');
+    if(id==='achievements') renderAchievements();
   });
 });
 
@@ -765,24 +819,48 @@ function toast(msg){
   setTimeout(()=>el.remove(), 3200);
 }
 
-// Achievements simple checks
-let achievements = new Set();
-function checkAchievements(gain){
-  const checks=[
-    [state.clicks>=1, 'First Click! +1 block'],
-    [state.clicks>=100, '100 Clicks! Keep stacking'],
-    [state.blocks>=1000, '1,000 Blocks! Base rising'],
-    [state.totalEver>=10000, '10k Stacked! Factory unlocked?'],
-    [Object.values(state.generators).reduce((a,b)=>a+b,0)>=10, '10 Buildings!'],
-    [bps>=100, '100 BPS! Automation!'],
-    [state.blueprints>=1, 'First Blueprint! Reinforced.'],
-  ];
-  checks.forEach(([cond,msg])=>{
-    if(cond && !achievements.has(msg)){
-      achievements.add(msg);
-      toast(msg);
-    }
+// Achievements — viewable in Achievements tab, persisted in save
+function renderAchievements(){
+  if(!achGrid) return;
+  const total = ACHIEVEMENTS.length;
+  const unlockedCount = state.achievementsUnlocked.length;
+  achCount.textContent = `${unlockedCount} / ${total}`;
+  const pct = total ? Math.round(unlockedCount/total*100) : 0;
+  achFill.style.width = pct + '%';
+  achText.textContent = pct + '%';
+  achGrid.innerHTML='';
+  ACHIEVEMENTS.forEach(a=>{
+    const isUnlocked = state.achievementsUnlocked.includes(a.id);
+    const card=document.createElement('div');
+    card.className='ach-card ' + (isUnlocked ? 'unlocked' : 'locked');
+    card.innerHTML=`
+      <div class="ach-icon">${iconSvg(a.icon)}</div>
+      <div class="ach-info">
+        <h5>${a.name}</h5>
+        <p>${a.desc}</p>
+      </div>
+      <span class="ach-status">${isUnlocked ? 'UNLOCKED' : 'LOCKED'}</span>
+    `;
+    achGrid.appendChild(card);
   });
+}
+
+function checkAchievements(){
+  let newly=0;
+  for(const a of ACHIEVEMENTS){
+    if(state.achievementsUnlocked.includes(a.id)) continue;
+    try{
+      if(a.check()){
+        state.achievementsUnlocked.push(a.id);
+        newly++;
+        toast(`🏆 ${a.name} — ${a.desc}`);
+      }
+    }catch{}
+  }
+  if(newly>0){
+    save();
+    renderAchievements();
+  }
 }
 
 // Settings
@@ -812,9 +890,13 @@ document.getElementById('import-btn').addEventListener('click', ()=>{
     if(!data.blocks && data.blocks!==0) throw new Error('invalid');
     if(!confirm('Import this save? Current progress will be overwritten.')) return;
     state={...defaultState(), ...data};
+    // ensure new fields from imported save are normalized
+    state.achievementsUnlocked = Array.isArray(data.achievementsUnlocked) ? data.achievementsUnlocked : (state.achievementsUnlocked||[]);
+    state.stats = { ...defaultState().stats, ...(data.stats||{}) };
     save();
     recalc();
     renderAllShops();
+    renderAchievements();
     updateUI();
     toast('Save imported!');
   }catch(e){ toast('Invalid save string'); }
@@ -826,6 +908,7 @@ document.getElementById('reset-btn').addEventListener('click', ()=>{
       state=defaultState();
       recalc();
       renderAllShops();
+      renderAchievements();
       updateUI();
       toast('Save wiped. Fresh base!');
     }
@@ -850,7 +933,9 @@ document.getElementById('toggle-particles').checked=state.settings.particles;
 document.getElementById('toggle-shake').checked=state.settings.shake;
 document.getElementById('toggle-numbers').checked=state.settings.compact;
 renderAllShops();
+renderAchievements();
 updateUI();
+checkAchievements();
 scheduleGolden();
 loop();
 // fast tick for income + ui

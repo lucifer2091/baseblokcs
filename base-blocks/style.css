@@ -508,6 +508,68 @@ body{
 .blueprint-card h5{font-size:.84rem;font-weight:700;display:flex;align-items:center;gap:6px}
 .blueprint-card p{font-size:.72rem;color:var(--muted);margin:2px 0 0;line-height:1.3}
 
+/* Achievements */
+.ach-header{
+  background:var(--panel-2);
+  border:1px solid var(--border);
+  border-radius:var(--radius-sm);
+  padding:12px;
+  margin-bottom:12px;
+}
+.ach-title{
+  display:flex;align-items:center;gap:8px;
+  font-family:var(--font-ui);font-weight:700;font-size:.82rem;letter-spacing:.04em;
+  color:var(--text);text-transform:uppercase;
+}
+.ach-title svg{width:16px;height:16px;color:var(--accent)}
+.ach-count{margin-left:auto;font-size:.78rem;color:var(--accent)}
+.ach-progress-wrap{
+  display:flex;align-items:center;gap:10px;margin-top:10px;
+}
+.ach-progress-bar{
+  flex:1;height:8px;background:var(--bg-2);
+  border:1px solid var(--border);border-radius:999px;overflow:hidden;
+}
+.ach-progress-fill{
+  height:100%;width:0%;
+  background:linear-gradient(90deg,var(--accent),var(--accent-2));
+  border-radius:999px;transition:width .4s ease;
+}
+.ach-progress-text{font-size:.72rem;color:var(--muted);min-width:38px;text-align:right}
+.ach-grid{display:grid;gap:8px}
+.ach-card{
+  display:grid;grid-template-columns:42px 1fr auto;
+  gap:10px;align-items:center;
+  background:var(--panel-2);
+  border:1px solid var(--border);
+  border-radius:var(--radius-sm);
+  padding:10px;
+  transition:.18s;
+}
+.ach-card.locked{opacity:.58;filter:grayscale(.25)}
+.ach-card.unlocked{
+  background:var(--panel-3);
+  border-color:rgba(255,158,44,.35);
+  box-shadow:inset 3px 0 0 var(--accent);
+}
+.ach-icon{
+  width:42px;height:42px;border-radius:8px;
+  display:grid;place-items:center;
+  background:var(--bg-2);border:1px solid var(--border-2);
+  color:var(--dim);
+}
+.ach-card.unlocked .ach-icon{
+  background:rgba(255,158,44,.14);
+  border-color:rgba(255,158,44,.30);
+  color:var(--accent);
+}
+.ach-icon svg{width:22px;height:22px;display:block}
+.ach-info h5{font-size:.86rem;font-weight:700;line-height:1.2;display:flex;align-items:center;gap:6px}
+.ach-info p{font-size:.72rem;color:var(--muted);margin-top:2px;line-height:1.35}
+.ach-status{font-family:var(--font-mono);font-size:.68rem;font-weight:700;padding:5px 9px;border-radius:999px;border:1px solid var(--border-2);background:var(--bg-2);color:var(--muted);white-space:nowrap}
+.ach-card.unlocked .ach-status{background:rgba(255,158,44,.14);border-color:rgba(255,158,44,.35);color:var(--accent)}
+.ach-hint{font-size:.70rem;color:var(--dim);text-align:center;margin-top:10px}
+
 /* Shop footer */
 .shop-footer{
   display:flex;gap:8px;padding:11px;
