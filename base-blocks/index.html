@@ -45,9 +45,6 @@
                     <span class="topstat-value mono" id="playtime">00:00</span>
                 </div>
                 <div class="top-actions">
-                    <button class="icon-btn" id="save-btn" title="Save (auto-saves every 10s)" aria-label="Save">
-                        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M5 3h11l3 3v15H5z"/><path d="M8 3v5h7V3"/><rect x="8" y="13" width="8" height="5"/></svg>
-                    </button>
                     <button class="icon-btn" id="settings-btn" title="Settings" aria-label="Settings">
                         <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M19.1 4.9L17 7M7 17l-2.1 2.1"/></svg>
                     </button>
@@ -146,7 +143,7 @@
                     <div class="prestige-panel">
                         <div class="prestige-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M12 3 L20 12 L12 21 L4 12 Z"/></svg></div>
                         <h3>REINFORCE YOUR BASE</h3>
-                        <p>Demolish everything and keep <b>Blueprints</b>. Each Blueprint gives <b>+15% to all production</b> permanently. The higher you build, the more you earn.</p>
+                        <p>Demolish everything and keep <b>Blueprints</b>. Each Blueprint gives <b>+12% to all production</b> permanently. The higher you build, the more you earn.</p>
                         <div class="prestige-stats">
                             <div class="pstat">
                                 <span>Current Blueprints</span>
@@ -162,7 +159,7 @@
                             </div>
                         </div>
                         <button class="prestige-big-btn" id="prestige-big-btn">REINFORCE NOW</button>
-                        <p class="prestige-req mono" id="prestige-req">Need 25,000 blocks to Reinforce</p>
+                        <p class="prestige-req mono" id="prestige-req">Need 18,000 blocks to Reinforce</p>
                         <div class="prestige-perks">
                             <h4>Blueprint Shop</h4>
                             <div id="blueprint-shop"></div>
@@ -171,10 +168,7 @@
                 </div>
             </div>
 
-            <div class="shop-footer">
-                <button class="footer-btn" id="export-btn">EXPORT SAVE</button>
-                <button class="footer-btn danger" id="reset-btn">WIPE SAVE</button>
-            </div>
+
         </section>
     </main>
 
@@ -203,6 +197,18 @@
                     <input type="checkbox" id="toggle-numbers" checked>
                     <span>Compact Numbers (K/M/B)</span>
                 </label>
+
+                <div class="settings-divider"></div>
+
+                <div class="setting-row">
+                    <span>Save Data</span>
+                    <div style="display:flex;gap:8px;flex-wrap:wrap">
+                        <button id="save-btn" class="small-btn" style="flex:1;min-width:140px" title="Manual save (auto-saves every 10s)">💾 SAVE NOW</button>
+                        <button id="export-btn" class="small-btn" style="flex:1;min-width:140px">📤 EXPORT SAVE</button>
+                    </div>
+                    <p class="modal-hint" style="text-align:left;margin:0">Auto-saves every 10s. Export copies a code for backups.</p>
+                </div>
+
                 <div class="setting-row">
                     <span>Import Save</span>
                     <div class="import-row">
@@ -211,10 +217,19 @@
                     </div>
                 </div>
                 <div class="setting-row">
-                    <span>Export Save</span>
-                    <textarea id="export-area" readonly rows="3" placeholder="Click EXPORT SAVE..."></textarea>
+                    <span>Export Output</span>
+                    <textarea id="export-area" readonly rows="3" placeholder="Click EXPORT SAVE to generate..."></textarea>
                 </div>
-                <p class="modal-hint">Game auto-saves every 10 seconds. Your base is stored locally.</p>
+
+                <div class="settings-divider"></div>
+
+                <div class="setting-row">
+                    <span style="color:#ff8a8a">Danger Zone</span>
+                    <button id="reset-btn" class="danger-btn">🗑️ WIPE SAVE — RESET EVERYTHING</button>
+                    <p style="font-size:.72rem;color:var(--dim);line-height:1.4">Permanently erases blocks, generators, upgrades, blueprints & playtime. Requires double confirmation. This cannot be undone.</p>
+                </div>
+
+                <p class="modal-hint">Your base is stored locally (localStorage). Balance patch v1.2 active.</p>
             </div>
         </div>
     </div>

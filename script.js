@@ -1,13 +1,13 @@
 /* BASE BLOCKS - Incremental Clicker */
 
 const GENERATORS = [
-  { id:'worker', name:'Brick Layer', icon:'worker', desc:'Lays bricks by hand. Honest work.', baseCost:15, bps:1, costMult:1.15 },
-  { id:'miner', name:'Auto Miner', icon:'miner', desc:'Digs blocks automatically.', baseCost:100, bps:6, costMult:1.15 },
-  { id:'factory', name:'Block Factory', icon:'factory', desc:'Assembly line of blocks.', baseCost:550, bps:28, costMult:1.16 },
-  { id:'quarry', name:'Deep Quarry', icon:'quarry', desc:'Excavates massive chunks.', baseCost:3000, bps:140, costMult:1.17 },
-  { id:'printer', name:'3D Printer', icon:'printer', desc:'Prints blocks layer by layer.', baseCost:16000, bps:780, costMult:1.18 },
-  { id:'quantum', name:'Quantum Lab', icon:'quantum', desc:'Entangles blocks into existence.', baseCost:95000, bps:4200, costMult:1.19 },
-  { id:'forge', name:'Singularity Forge', icon:'forge', desc:'Forges blocks from spacetime.', baseCost:700000, bps:26000, costMult:1.20 },
+  { id:'worker', name:'Brick Layer', icon:'worker', desc:'Lays bricks by hand. Honest work.', baseCost:12, bps:0.8, costMult:1.16 },
+  { id:'miner', name:'Auto Miner', icon:'miner', desc:'Digs blocks automatically.', baseCost:90, bps:5, costMult:1.16 },
+  { id:'factory', name:'Block Factory', icon:'factory', desc:'Assembly line of blocks.', baseCost:450, bps:22, costMult:1.17 },
+  { id:'quarry', name:'Deep Quarry', icon:'quarry', desc:'Excavates massive chunks.', baseCost:2600, bps:110, costMult:1.18 },
+  { id:'printer', name:'3D Printer', icon:'printer', desc:'Prints blocks layer by layer.', baseCost:13500, bps:620, costMult:1.19 },
+  { id:'quantum', name:'Quantum Lab', icon:'quantum', desc:'Entangles blocks into existence.', baseCost:82000, bps:3400, costMult:1.20 },
+  { id:'forge', name:'Singularity Forge', icon:'forge', desc:'Forges blocks from spacetime.', baseCost:580000, bps:21000, costMult:1.21 },
 ];
 
 /* Custom icon set — hand-built SVG (24x24), tinted per section via currentColor.
@@ -44,29 +44,30 @@ function iconSvg(key){
 }
 
 const UPGRADES = [
-  { id:'click1', name:'Reinforced Gloves', icon:'glove', desc:'+1 per click', cost:80, type:'clickFlat', value:1, req:0 },
-  { id:'click2', name:'Steel Hammer', icon:'hammer', desc:'+4 per click', cost:400, type:'clickFlat', value:4, req:1 },
-  { id:'click3', name:'Jackhammer', icon:'jackhammer', desc:'+12 per click', cost:2200, type:'clickFlat', value:12, req:2 },
-  { id:'click4', name:'Plasma Drill', icon:'drill', desc:'+45 per click', cost:15000, type:'clickFlat', value:45, req:3 },
-  { id:'click5', name:'Graviton Fist', icon:'fist', desc:'+180 per click', cost:95000, type:'clickFlat', value:180, req:4 },
-  { id:'crit1', name:'Lucky Strike', icon:'clover', desc:'5% crit chance (x5)', cost:1200, type:'critChance', value:0.05, req:0 },
-  { id:'crit2', name:'Critical Mastery', icon:'target', desc:'+10% crit chance, crit x8', cost:18000, type:'critMult', value:8, req:5 },
-  { id:'mult1', name:'Efficient Blueprints', icon:'ruler', desc:'All production x1.5', cost:5000, type:'globalMult', value:1.5, req:0 },
-  { id:'mult2', name:'Industrial Overclock', icon:'bolt', desc:'All production x2', cost:35000, type:'globalMult', value:2, req:7 },
-  { id:'mult3', name:'Quantum Efficiency', icon:'gauge', desc:'All production x2.5', cost:250000, type:'globalMult', value:2.5, req:8 },
-  { id:'autoClick', name:'Auto-Clicker Arm', icon:'arm', desc:'Gain 15% of BPS on each click', cost:8000, type:'autoClickPct', value:0.15, req:0 },
-  { id:'golden', name:'Golden Detector', icon:'lens', desc:'Golden Blocks appear more often (2x) & last longer', cost:6000, type:'goldenBoost', value:2, req:0 },
+  { id:'click1', name:'Reinforced Gloves', icon:'glove', desc:'+1 per click', cost:50, type:'clickFlat', value:1, req:0 },
+  { id:'click2', name:'Steel Hammer', icon:'hammer', desc:'+4 per click', cost:300, type:'clickFlat', value:4, req:1 },
+  { id:'click3', name:'Jackhammer', icon:'jackhammer', desc:'+10 per click', cost:1800, type:'clickFlat', value:10, req:2 },
+  { id:'click4', name:'Plasma Drill', icon:'drill', desc:'+45 per click', cost:11000, type:'clickFlat', value:45, req:3 },
+  { id:'click5', name:'Graviton Fist', icon:'fist', desc:'+180 per click', cost:75000, type:'clickFlat', value:180, req:4 },
+  { id:'crit1', name:'Lucky Strike', icon:'clover', desc:'5% crit chance (x5)', cost:900, type:'critChance', value:0.05, req:0 },
+  { id:'crit2', name:'Critical Mastery', icon:'target', desc:'+10% crit chance, crit x7', cost:14000, type:'critMult', value:7, req:5 },
+  { id:'mult1', name:'Efficient Blueprints', icon:'ruler', desc:'All production x1.5', cost:3800, type:'globalMult', value:1.5, req:0 },
+  { id:'mult2', name:'Industrial Overclock', icon:'bolt', desc:'All production x2', cost:28000, type:'globalMult', value:2, req:7 },
+  { id:'mult3', name:'Quantum Efficiency', icon:'gauge', desc:'All production x2.5', cost:180000, type:'globalMult', value:2.5, req:8 },
+  { id:'autoClick', name:'Auto-Clicker Arm', icon:'arm', desc:'Gain 15% of BPS on each click', cost:6500, type:'autoClickPct', value:0.15, req:0 },
+  { id:'golden', name:'Golden Detector', icon:'lens', desc:'Golden Blocks appear more often (2x) & last longer', cost:4500, type:'goldenBoost', value:2, req:0 },
 ];
 
 const BLUEPRINT_SHOP = [
-  { id:'bpClick', name:'Blueprint Hands', icon:'hand', desc:'+2 base click per level', cost:1, costScale:1.6, type:'bpClick', value:2, max:25 },
-  { id:'bpBps', name:'Blueprint Engine', icon:'gear', desc:'+10% BPS per level', cost:2, costScale:1.7, type:'bpBpsMult', value:0.10, max:20 },
-  { id:'bpDiscount', name:'Supply Chain', icon:'box', desc:'-3% building cost per level', cost:3, costScale:1.8, type:'bpDiscount', value:0.03, max:15 },
-  { id:'bpGolden', name:'Golden Fortune', icon:'sparkle', desc:'+25% Golden Block reward', cost:5, costScale:2.0, type:'bpGolden', value:0.25, max:10 },
+  { id:'bpClick', name:'Blueprint Hands', icon:'hand', desc:'+2 base click per level', cost:1, costScale:1.65, type:'bpClick', value:2, max:25 },
+  { id:'bpBps', name:'Blueprint Engine', icon:'gear', desc:'+10% BPS per level', cost:2, costScale:1.75, type:'bpBpsMult', value:0.10, max:20 },
+  { id:'bpDiscount', name:'Supply Chain', icon:'box', desc:'-3% building cost per level', cost:3, costScale:1.85, type:'bpDiscount', value:0.03, max:15 },
+  { id:'bpGolden', name:'Golden Fortune', icon:'sparkle', desc:'+25% Golden Block reward', cost:5, costScale:2.05, type:'bpGolden', value:0.25, max:10 },
 ];
 
 const SAVE_KEY = 'baseblocks_save_v2';
-const PRESTIGE_REQUIREMENT = 25000;
+const PRESTIGE_REQUIREMENT = 18000;
+const PRESTIGE_MULT_PER_BP = 0.12; // 12% per blueprint (was 15%)
 
 function formatNum(n, compact=true){
   if(!compact){
@@ -212,8 +213,8 @@ function recalc(){
   }
   discount=Math.min(discount,0.6);
   clickPower = (flatClick + bpClickBonus) * (state.blueprints>0?1:1); // click not directly mult? but apply? Let's include small?
-  // prestige multiplier
-  const prestigeMult = 1 + state.blueprints*0.15;
+  // prestige multiplier — balanced to 12% per BP (down from 15%)
+  const prestigeMult = 1 + state.blueprints * PRESTIGE_MULT_PER_BP;
   globalMult *= prestigeMult * bpBpsMult;
   // cap crit
   critChance = Math.min(critChance,0.45);
@@ -253,9 +254,8 @@ function getGlobalMultWithoutPrestige(){
 function getPotentialBlueprints(){
   const total = state.totalEver;
   if(total < PRESTIGE_REQUIREMENT) return 0;
-  // formula: floor( sqrt(total / 25000) ) ??? Let's make progressive
-  // Using example: 25k =>1, 100k=>2, 225k=>3, 400k=>4
-  // sqrt(total/25000)
+  // Balanced: easier early prestige — 18k =>1, 72k=>2, 162k=>3, 288k=>4
+  // sqrt(total/18000)
   return Math.floor(Math.sqrt(total / PRESTIGE_REQUIREMENT));
 }
 function getBlueprintsOnReset(){
@@ -281,12 +281,12 @@ function updateUI(){
   elStatBuilt.textContent = formatNum(totalBuilt, compact);
   elStatBlueprints.textContent = formatNum(state.blueprints, compact);
   elPrestigeBadge.textContent = `x${(state._prestigeMult||1).toFixed(2)}`;
-  // prestige banner
+  // prestige banner — now 12% per BP
   const gain = getBlueprintsOnReset();
   if(gain>0){
     elPrestigeBanner.classList.remove('hidden');
     elPrestigePreview.textContent = gain;
-    elPrestigeBonusPreview.textContent = Math.round(gain*15)+'%';
+    elPrestigeBonusPreview.textContent = Math.round(gain * PRESTIGE_MULT_PER_BP * 100)+'%';
   }else{
     elPrestigeBanner.classList.add('hidden');
   }
@@ -298,7 +298,7 @@ function updateUI(){
   const bigBtn=document.getElementById('prestige-big-btn');
   if(gain>0){
     bigBtn.disabled=false;
-    reqEl.textContent=`Gain ${gain} Blueprint${gain>1?'s':''} +${gain*15}% permanent production`;
+    reqEl.textContent=`Gain ${gain} Blueprint${gain>1?'s':''} +${Math.round(gain * PRESTIGE_MULT_PER_BP * 100)}% permanent production`;
     reqEl.style.color='var(--green)';
   }else{
     bigBtn.disabled=true;
@@ -612,7 +612,7 @@ function doPrestige(){
     toast('Not enough lifetime blocks to Reinforce');
     return;
   }
-  if(!confirm(`Reinforce your base?\n\nYou will lose all blocks, generators and upgrades.\nYou will gain ${gain} Blueprints (x${(1+ (state.blueprints+gain)*0.15).toFixed(2)} total mult).\n\nBlueprints are permanent!\nContinue?`)) return;
+  if(!confirm(`Reinforce your base?\n\nYou will lose all blocks, generators and upgrades.\nYou will gain ${gain} Blueprints (x${(1+ (state.blueprints+gain)*PRESTIGE_MULT_PER_BP).toFixed(2)} total mult).\n\nBlueprints are permanent!\nContinue?`)) return;
   state.blueprints+=gain;
   state.prestigeCount++;
   // reset
@@ -659,7 +659,7 @@ function spawnGolden(){
 goldenBlock.addEventListener('click', ()=>{
   goldenBlock.classList.add('hidden');
   if(goldenTimeout) clearTimeout(goldenTimeout);
-  const reward = Math.max( Math.floor(state.blocks * 0.12 * state._goldenMult), Math.floor(bps*10+ 50) );
+  const reward = Math.max( Math.floor(state.blocks * 0.10 * state._goldenMult), Math.floor(bps*8+ 40) );
   // Also add bonus based on totalEver? ensures early game decent
   const final = Math.max(reward, 120);
   state.blocks+=final;
