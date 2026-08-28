@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BASE BLOCKS — Incremental Builder</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;700;800;900&family=JetBrains+Mono:wght@600;700&family=Inter:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+    <!-- Ambient -->
+    <div class="ambient-bg">
+        <div class="ambient-grid"></div>
+        <div class="ambient-blobs">
+            <span class="blob b1"></span>
+            <span class="blob b2"></span>
+            <span class="blob b3"></span>
+        </div>
+        <div class="ambient-vignette"></div>
+    </div>
+
+    <!-- Header -->
+    <header class="topbar">
+        <div class="topbar-inner">
+            <div class="brand">
+                <div class="brand-cube">
+                    <div class="cube-face top"></div>
+                    <div class="cube-face front"></div>
+                    <div class="cube-face side"></div>
+                </div>
+                <div class="brand-text">
+                    <h1>BASE BLOCKS</h1>
+                    <span>BUILD • STACK • PRESTIGE</span>
+                </div>
+                <div class="brand-badge" id="prestige-badge" title="Prestige multiplier">
+                    <span class="badge-icon">◆</span>
+                    <span id="prestige-mult-display">x1.0</span>
+                </div>
+            </div>
+
+            <div class="topstats">
+                <div class="topstat">
+                    <span class="topstat-label">TOTAL STACKED</span>
+                    <span class="topstat-value mono" id="total-ever">0</span>
+                </div>
+                <div class="topstat hide-mobile">
+                    <span class="topstat-label">PLAY TIME</span>
+                    <span class="topstat-value mono" id="playtime">00:00</span>
+                </div>
+                <div class="top-actions">
+                    <button class="icon-btn" id="save-btn" title="Save (auto-saves every 10s)">💾</button>
+                    <button class="icon-btn" id="settings-btn" title="Settings">⚙</button>
+                </div>
+            </div>
+        </div>
+        <!-- prestige banner -->
+        <div class="prestige-banner hidden" id="prestige-banner">
+            <div class="prestige-banner-inner">
+                <span>🏗️ You can <strong>REINFORCE</strong> your base! Reset for <b id="prestige-preview">0</b> Blueprints (+<span id="prestige-bonus-preview">0%</span> permanent boost)</span>
+                <button class="prestige-cta" id="prestige-btn">REINFORCE BASE</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Layout -->
+    <main class="layout">
+        <!-- LEFT: Click Area -->
+        <section class="panel panel-main">
+            <div class="counter-area">
+                <div class="counter-label">BLOCKS</div>
+                <div class="counter-value mono" id="blocks-display">0</div>
+                <div class="counter-sub mono" id="bps-display">0.0 blocks / sec</div>
+                <div class="counter-sub small" id="click-power-display">1 per click</div>
+            </div>
+
+            <!-- The Block Button -->
+            <div class="block-stage" id="block-stage">
+                <div class="block-shadow"></div>
+                <button class="big-block" id="big-block" aria-label="Mine block">
+                    <div class="block-iso">
+                        <div class="iso-top"></div>
+                        <div class="iso-front">
+                            <div class="block-pattern"></div>
+                            <div class="block-highlight"></div>
+                        </div>
+                        <div class="iso-side">
+                            <div class="block-pattern dark"></div>
+                        </div>
+                        <div class="iso-crack" id="crack-layer"></div>
+                    </div>
+                    <div class="block-label">MINE</div>
+                </button>
+                <div class="click-fx-layer" id="click-fx-layer"></div>
+                <!-- Golden block -->
+                <button class="golden-block hidden" id="golden-block" title="Golden Block! +10% of bank">◆</button>
+            </div>
+
+            <!-- Mini stats -->
+            <div class="mini-stats">
+                <div class="mini-stat">
+                    <span class="mini-stat-num mono" id="stat-clicks">0</span>
+                    <span class="mini-stat-label">clicks</span>
+                </div>
+                <div class="mini-stat">
+                    <span class="mini-stat-num mono" id="stat-built">0</span>
+                    <span class="mini-stat-label">built</span>
+                </div>
+                <div class="mini-stat">
+                    <span class="mini-stat-num mono" id="stat-blueprints">0</span>
+                    <span class="mini-stat-label">blueprints</span>
+                </div>
+            </div>
+
+            <!-- Base Visualization -->
+            <div class="base-viz">
+                <div class="viz-header">
+                    <span>YOUR BASE</span>
+                    <span class="mono viz-height" id="viz-height">0m high</span>
+                </div>
+                <div class="viz-tower-wrap">
+                    <div class="viz-ground"></div>
+                    <div class="viz-tower" id="viz-tower">
+                        <!-- blocks injected by JS -->
+                    </div>
+                    <div class="viz-scaffold"></div>
+                </div>
+                <div class="viz-progress">
+                    <div class="viz-progress-bar" id="viz-progress-bar"></div>
+                </div>
+                <div class="viz-next mono" id="viz-next">Next layer at 100 blocks</div>
+            </div>
+        </section>
+
+        <!-- RIGHT: Shop -->
+        <section class="panel panel-shop">
+            <div class="shop-tabs" id="shop-tabs">
+                <button class="tab active" data-tab="generators">⚙ GENERATORS</button>
+                <button class="tab" data-tab="upgrades">⚡ UPGRADES</button>
+                <button class="tab" data-tab="prestige">◆ BLUEPRINTS</button>
+            </div>
+
+            <div class="shop-content">
+                <!-- Generators -->
+                <div class="tab-pane active" id="pane-generators">
+                    <div class="shop-list" id="generators-list"></div>
+                </div>
+
+                <!-- Upgrades -->
+                <div class="tab-pane" id="pane-upgrades">
+                    <div class="shop-list" id="upgrades-list"></div>
+                </div>
+
+                <!-- Prestige -->
+                <div class="tab-pane" id="pane-prestige">
+                    <div class="prestige-panel">
+                        <div class="prestige-icon">◆</div>
+                        <h3>REINFORCE YOUR BASE</h3>
+                        <p>Demolish everything and keep <b>Blueprints</b>. Each Blueprint gives <b>+15% to all production</b> permanently. The higher you build, the more you earn.</p>
+                        <div class="prestige-stats">
+                            <div class="pstat">
+                                <span>Current Blueprints</span>
+                                <b class="mono" id="p-blue-current">0</b>
+                            </div>
+                            <div class="pstat">
+                                <span>Multiplier</span>
+                                <b class="mono" id="p-mult">x1.00</b>
+                            </div>
+                            <div class="pstat highlight">
+                                <span>On Reinforce</span>
+                                <b class="mono" id="p-on-reset">+0</b>
+                            </div>
+                        </div>
+                        <button class="prestige-big-btn" id="prestige-big-btn">REINFORCE NOW</button>
+                        <p class="prestige-req mono" id="prestige-req">Need 25,000 blocks to Reinforce</p>
+                        <div class="prestige-perks">
+                            <h4>Blueprint Shop</h4>
+                            <div id="blueprint-shop"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="shop-footer">
+                <button class="footer-btn" id="export-btn">EXPORT SAVE</button>
+                <button class="footer-btn danger" id="reset-btn">WIPE SAVE</button>
+            </div>
+        </section>
+    </main>
+
+    <!-- Toast -->
+    <div class="toast-stack" id="toast-stack"></div>
+
+    <!-- Settings Modal -->
+    <div class="modal-overlay hidden" id="settings-modal">
+        <div class="modal">
+            <div class="modal-head">
+                <h2>Settings</h2>
+                <button class="icon-btn" id="close-settings">✕</button>
+            </div>
+            <div class="modal-body">
+                <label class="toggle">
+                    <input type="checkbox" id="toggle-particles" checked>
+                    <span>Particles & Floaters</span>
+                </label>
+                <label class="toggle">
+                    <input type="checkbox" id="toggle-shake" checked>
+                    <span>Screen Shake on Crit</span>
+                </label>
+                <label class="toggle">
+                    <input type="checkbox" id="toggle-numbers" checked>
+                    <span>Compact Numbers (K/M/B)</span>
+                </label>
+                <div class="setting-row">
+                    <span>Import Save</span>
+                    <div class="import-row">
+                        <input id="import-input" placeholder="Paste save string..." />
+                        <button id="import-btn" class="small-btn">IMPORT</button>
+                    </div>
+                </div>
+                <div class="setting-row">
+                    <span>Export Save</span>
+                    <textarea id="export-area" readonly rows="3" placeholder="Click EXPORT SAVE..."></textarea>
+                </div>
+                <p class="modal-hint">Game auto-saves every 10 seconds. Your base is stored locally.</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
