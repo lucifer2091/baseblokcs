@@ -110,10 +110,6 @@ const blockStage=document.getElementById('block-stage');
 const clickFxLayer=document.getElementById('click-fx-layer');
 const crackLayer=document.getElementById('crack-layer');
 const goldenBlock=document.getElementById('golden-block');
-const vizTower=document.getElementById('viz-tower');
-const vizHeight=document.getElementById('viz-height');
-const vizBar=document.getElementById('viz-progress-bar');
-const vizNext=document.getElementById('viz-next');
 const genList=document.getElementById('generators-list');
 const upgList=document.getElementById('upgrades-list');
 const bpShopDiv=document.getElementById('blueprint-shop');
@@ -279,9 +275,6 @@ function updateUI(){
     reqEl.style.color='';
   }
 
-  // viz
-  updateViz();
-
   // shop highlights will be updated via renderShop? But we can do inline price color
   updateShopAffordability();
 }
@@ -311,82 +304,6 @@ function getClickGain(){
     isCrit=true;
   }
   return {gain, isCrit};
-}
-
-function updateViz(){
-  const h = state.totalEver;
-  // tower height logic: each 25 blocks per layer? Let's make exponential slower
-  // levels = floor(log1.6(total/20+1))? Try simpler: levels = floor(total/80) capped?
-  // Let's make layers = floor( 12* log10(total/100+1) + total/5000 )?
-  // Need tower to grow nicely to 160px ~16 blocks
-  let layers = 0;
-  if(h>0){
-    layers = Math.floor(Math.log10(h/80+1)*10 + Math.min(h/1200, 6));
-    layers = Math.min(layers, 22);
-  }
-  // build tower if needed
-  const existing = vizTower.children.length;
-  if(layers!==existing){
-    vizTower.innerHTML='';
-    for(let i=0;i<layers;i++){
-      const div=document.createElement('div');
-      div.className='viz-block';
-      // variety
-      if(i%7===6) div.classList.add('rare');
-      else if(i%3===2) div.classList.add('alt');
-      // width taper slightly
-      const w = 64 - Math.floor(i/4)*2;
-      div.style.width = w+'px';
-      // z? smaller top
-      div.style.opacity = 0.92 + (i%2)*0.08;
-      vizTower.appendChild(div);
-    }
-  }
-  const heightM = (h/12).toFixed(0); // 12 blocks =1m ?
-  vizHeight.textContent = formatNum(heightM,true)+'m high • '+layers+' layers';
-  // progress to next layer
-  // calc next threshold: invert layers formula approx: we need brute force find next h where layers increments
-  let nextH = h+1;
-  let nextLayers = layers;
-  // brute force up to +5000 steps
-  for(let test=h+1; test<h+8000 && test<h*2+200; test++){
-    let l = Math.floor(Math.log10(test/80+1)*10 + Math.min(test/1200,6));
-    l=Math.min(l,22);
-    if(l>layers){ nextH=test; nextLayers=l; break; }
-  }
-  if(layers>=22){
-    vizBar.style.width='100%';
-    vizNext.textContent='MAX HEIGHT! Reinforce to build higher.';
-  }else{
-    const prevThreshold = (()=>{ // find h where layers ==current
-      for(let t=Math.max(0,h-5000);t<=h;t++){
-        let l=Math.floor(Math.log10(t/80+1)*10+Math.min(t/1200,6)); l=Math.min(l,22);
-        if(l===layers) return t;
-      }
-      return 0;
-    })();
-    // Actually progress = (h - prevH)/(nextH - prevH)
-    let prevH = 0;
-    for(let t=0; t<h; t++){
-      let l=Math.floor(Math.log10(t/80+1)*10+Math.min(t/1200,6)); l=Math.min(l,22);
-      if(l===layers) { prevH=t; break; }
-    }
-    // Simpler: approximate prevH by reversing? We'll do binary search for prev threshold
-    // Let's find prevH via loop downwards from h
-    let low=0, high=h, best=0;
-    for(let i=0;i<30;i++){
-      let mid=Math.floor((low+high)/2);
-      let l=Math.floor(Math.log10(mid/80+1)*10+Math.min(mid/1200,6)); l=Math.min(l,22);
-      if(l<layers) low=mid+1;
-      else if(l>layers) high=mid-1;
-      else { best=mid; high=mid-1; }
-    }
-    // best is first occurrence of this layer count; to get start of layer, use best
-    prevH=best;
-    const prog = nextH>prevH ? (h-prevH)/(nextH-prevH) : 1;
-    vizBar.style.width = Math.max(0,Math.min(100, prog*100))+'%';
-    vizNext.textContent = `Next layer at ${formatNum(nextH,true)} total blocks • ${formatNum(nextH - h,true)} to go`;
-  }
 }
 
 function renderGenerators(){
@@ -617,9 +534,6 @@ function buyGenerator(id){
   renderAllShops();
   updateUI();
   toast(`Built ${g.name}!`);
-  // pop effect on tower?
-  vizTower.style.transform='scale(1.02)';
-  setTimeout(()=>vizTower.style.transform='',200);
 }
 function buyUpgrade(id){
   const u=UPGRADES.find(x=>x.id===id);
