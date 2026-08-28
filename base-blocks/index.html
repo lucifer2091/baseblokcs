@@ -69,6 +69,13 @@
                 <div class="counter-value mono" id="blocks-display">0</div>
                 <div class="counter-sub mono" id="bps-display">0.0 blocks / sec</div>
                 <div class="counter-sub small" id="click-power-display">1 per click</div>
+                <div class="goal-meter" id="goal-meter">
+                    <div class="goal-meter-head">
+                        <span class="goal-label">Next Reinforce</span>
+                        <span class="goal-pct mono" id="goal-pct">0%</span>
+                    </div>
+                    <div class="goal-bar"><div class="goal-bar-fill" id="goal-fill"></div></div>
+                </div>
             </div>
 
             <!-- The Block Button -->
@@ -92,6 +99,8 @@
                 <!-- Golden block -->
                 <button class="golden-block hidden" id="golden-block" title="Golden Block! +10% of bank"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M12 3 L20 12 L12 21 L4 12 Z"/></svg></button>
             </div>
+
+            <div class="hint">Click or press [Space] to mine</div>
 
             <!-- Mini stats -->
             <div class="mini-stats">

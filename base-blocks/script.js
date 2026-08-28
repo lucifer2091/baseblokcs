@@ -294,6 +294,25 @@ function updateUI(){
   document.getElementById('p-blue-current').textContent = state.blueprints;
   document.getElementById('p-mult').textContent = `x${(state._prestigeMult||1).toFixed(2)}`;
   document.getElementById('p-on-reset').textContent = `+${gain}`;
+  // Reinforce progress meter — "what am I working toward?"
+  const gm=document.getElementById('goal-meter');
+  const gf=document.getElementById('goal-fill');
+  const gp=document.getElementById('goal-pct');
+  const tier=getPotentialBlueprints();
+  let goalPct;
+  if(gain>0){
+    goalPct=100;
+    gm.classList.add('ready');
+    gp.textContent='READY';
+  }else{
+    gm.classList.remove('ready');
+    const tierLow=PRESTIGE_REQUIREMENT*tier*tier;
+    const tierHigh=PRESTIGE_REQUIREMENT*(tier+1)*(tier+1);
+    goalPct=Math.max(0,Math.min(100,((state.totalEver-tierLow)/(tierHigh-tierLow))*100));
+    gp.textContent=Math.floor(goalPct)+'%';
+  }
+  gf.style.width=goalPct+'%';
+
   const reqEl=document.getElementById('prestige-req');
   const bigBtn=document.getElementById('prestige-big-btn');
   if(gain>0){
@@ -375,12 +394,12 @@ function renderUpgrades(){
       card.className='shop-card';
       card.style.opacity='.6';
       card.innerHTML=`
-        <div class="shop-icon upg" style="background:linear-gradient(135deg, rgba(46,232,158,.2), rgba(46,232,158,.08));border-color:rgba(46,232,158,.3)">${iconSvg(u.icon)}</div>
-        <div class="shop-info">
-          <div class="shop-name">${u.name} <span class="shop-owned" style="background:rgba(46,232,158,.15);color:#b6ffdf;border-color:rgba(46,232,158,.25)">OWNED ✓</span></div>
-          <div class="shop-desc">${u.desc}</div>
-        </div>
-        <div class="shop-buy"><div style="font-size:.75rem;color:var(--green);font-weight:800">PURCHASED</div></div>
+          <div class="shop-icon upg" style="background:linear-gradient(135deg, rgba(46,232,158,.2), rgba(46,232,158,.08));border-color:rgba(46,232,158,.3)">${iconSvg(u.icon)}</div>
+          <div class="shop-info">
+            <div class="shop-name">${u.name} <span class="stamp">INSTALLED</span></div>
+            <div class="shop-desc">${u.desc}</div>
+          </div>
+          <div class="shop-buy"><div class="stamp">PURCHASED</div></div>
       `;
       upgList.appendChild(card);
       return;
@@ -507,6 +526,10 @@ function doClick(e){
   recalc();
   updateUI();
   throttledRender();
+  // subtle satisfying bump on the resource readout (click only, not every tick)
+  elBlocks.classList.remove('bump');
+  void elBlocks.offsetWidth;
+  elBlocks.classList.add('bump');
   checkAchievements(gain);
 }
 
