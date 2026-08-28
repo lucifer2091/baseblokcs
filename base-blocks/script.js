@@ -1,35 +1,68 @@
 /* BASE BLOCKS - Incremental Clicker */
 
 const GENERATORS = [
-  { id:'worker', name:'Brick Layer', icon:'🧱', desc:'Lays bricks by hand. Honest work.', baseCost:15, bps:1, costMult:1.15 },
-  { id:'miner', name:'Auto Miner', icon:'⛏️', desc:'Digs blocks automatically.', baseCost:100, bps:6, costMult:1.15 },
-  { id:'factory', name:'Block Factory', icon:'🏭', desc:'Assembly line of blocks.', baseCost:550, bps:28, costMult:1.16 },
-  { id:'quarry', name:'Deep Quarry', icon:'⛰️', desc:'Excavates massive chunks.', baseCost:3000, bps:140, costMult:1.17 },
-  { id:'printer', name:'3D Printer', icon:'🖨️', desc:'Prints blocks layer by layer.', baseCost:16000, bps:780, costMult:1.18 },
-  { id:'quantum', name:'Quantum Lab', icon:'⚛️', desc:'Entangles blocks into existence.', baseCost:95000, bps:4200, costMult:1.19 },
-  { id:'forge', name:'Singularity Forge', icon:'🌌', desc:'Forges blocks from spacetime.', baseCost:700000, bps:26000, costMult:1.20 },
+  { id:'worker', name:'Brick Layer', icon:'worker', desc:'Lays bricks by hand. Honest work.', baseCost:15, bps:1, costMult:1.15 },
+  { id:'miner', name:'Auto Miner', icon:'miner', desc:'Digs blocks automatically.', baseCost:100, bps:6, costMult:1.15 },
+  { id:'factory', name:'Block Factory', icon:'factory', desc:'Assembly line of blocks.', baseCost:550, bps:28, costMult:1.16 },
+  { id:'quarry', name:'Deep Quarry', icon:'quarry', desc:'Excavates massive chunks.', baseCost:3000, bps:140, costMult:1.17 },
+  { id:'printer', name:'3D Printer', icon:'printer', desc:'Prints blocks layer by layer.', baseCost:16000, bps:780, costMult:1.18 },
+  { id:'quantum', name:'Quantum Lab', icon:'quantum', desc:'Entangles blocks into existence.', baseCost:95000, bps:4200, costMult:1.19 },
+  { id:'forge', name:'Singularity Forge', icon:'forge', desc:'Forges blocks from spacetime.', baseCost:700000, bps:26000, costMult:1.20 },
 ];
 
+/* Custom icon set — hand-built SVG (24x24), tinted per section via currentColor.
+   Style: consistent line weight, construction/block themed. No emoji. */
+const ICONS = {
+  worker: '<rect x="3" y="6" width="8" height="4" rx="1"/><rect x="13" y="6" width="8" height="4" rx="1"/><rect x="3" y="12" width="8" height="4" rx="1"/><rect x="13" y="12" width="8" height="4" rx="1"/><rect x="7" y="18" width="8" height="4" rx="1"/>',
+  miner: '<path d="M4 20 L13 11"/><path d="M13 11 a7 6 0 0 1 8 -3"/><path d="M13 11 a7 6 0 0 1 -2 8"/>',
+  factory: '<path d="M4 21 V11 L9 8 V11 L14 8 V11 L19 8 V21 Z"/><rect x="7" y="14" width="3" height="3"/><rect x="12" y="14" width="3" height="3"/>',
+  quarry: '<path d="M3 18 L9 8 L13 14 L16 9 L21 18 Z"/><path d="M12 11 L13.5 14 L11 16"/>',
+  printer: '<rect x="5" y="9" width="14" height="9" rx="1.5"/><path d="M9 9 V6 h6 v3"/><rect x="9" y="14" width="6" height="4" fill="currentColor" opacity="0.35"/>',
+  quantum: '<circle cx="12" cy="12" r="2" fill="currentColor"/><ellipse cx="12" cy="12" rx="9" ry="3.6"/><ellipse cx="12" cy="12" rx="9" ry="3.6" transform="rotate(60 12 12)"/><ellipse cx="12" cy="12" rx="9" ry="3.6" transform="rotate(120 12 12)"/>',
+  forge: '<circle cx="12" cy="12" r="2" fill="currentColor"/><circle cx="12" cy="12" r="5.5" opacity="0.5"/><circle cx="12" cy="12" r="9" opacity="0.28"/>',
+  glove: '<path d="M7 11 V7.5 a1.4 1.4 0 0 1 2.8 0 V7 a1.4 1.4 0 0 1 2.8 0 V7 a1.4 1.4 0 0 1 2.8 0 V11"/><path d="M7 11 V15 a2 2 0 0 0 2 2 h5 a2 2 0 0 0 2 -2 V11"/>',
+  hammer: '<path d="M14.5 4.5 L19.5 9.5 L16.5 12.5 L11.5 7.5 Z"/><path d="M11 7 L4 14"/>',
+  jackhammer: '<path d="M9.5 3 h5 v4 l-1.5 1.5 h-2 L11 7 Z"/><line x1="12" y1="10.5" x2="12" y2="17"/><path d="M8.5 17 h7 l-1 3.5 h-5 Z"/><line x1="12" y1="20.5" x2="12" y2="22"/>',
+  drill: '<rect x="9" y="3" width="6" height="6" rx="1"/><path d="M10.5 9 L12 17 L13.5 9 Z"/><line x1="9" y1="15" x2="15" y2="15"/>',
+  fist: '<path d="M12 3 C13 9 15 11 21 12 C15 13 13 15 12 21 C11 15 9 13 3 12 C9 11 11 9 12 3 Z"/>',
+  clover: '<circle cx="12" cy="9" r="2.4"/><circle cx="9" cy="12" r="2.4"/><circle cx="15" cy="12" r="2.4"/><circle cx="12" cy="15" r="2.4"/><line x1="12" y1="15" x2="12" y2="20"/>',
+  target: '<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4.2"/><circle cx="12" cy="12" r="1.2" fill="currentColor"/>',
+  ruler: '<path d="M4 19 L4 8 L19 19 Z"/><line x1="4" y1="13.5" x2="9.5" y2="19"/>',
+  bolt: '<path d="M13 3 L6 13 H11 L10 21 L18 10 H12 Z"/>',
+  gauge: '<path d="M4 18 a8 8 0 0 1 16 0"/><line x1="12" y1="18" x2="16" y2="12"/><circle cx="12" cy="18" r="1.4" fill="currentColor"/>',
+  arm: '<rect x="4" y="19" width="5" height="2" rx="0.5"/><path d="M6.5 19 V11"/><path d="M6.5 11 L16 8"/><path d="M16 8 v-3 l-2 1 M16 8 v-3 l2 1"/>',
+  lens: '<circle cx="10" cy="10" r="5"/><line x1="14" y1="14" x2="19" y2="19"/>',
+  hand: '<path d="M8 11 V6.5 a1.4 1.4 0 0 1 2.8 0 V6 a1.4 1.4 0 0 1 2.8 0 V6 a1.4 1.4 0 0 1 2.8 0 V12"/><path d="M8 11 V15 a2 2 0 0 0 2 2 h5 a2 2 0 0 0 2 -2 V11"/>',
+  gear: '<circle cx="12" cy="12" r="3.6"/><path d="M12 3.5 v3 M12 17.5 v3 M3.5 12 h3 M17.5 12 h3 M6 6 l2 2 M16 16 l2 2 M18 6 l-2 2 M8 16 l-2 2"/>',
+  box: '<path d="M4 8 L12 4 L20 8 V16 L12 20 L4 16 Z"/><path d="M4 8 L12 12 L20 8"/><path d="M12 12 V20"/>',
+  sparkle: '<path d="M12 3 C13 9 15 11 21 12 C15 13 13 15 12 21 C11 15 9 13 3 12 C9 11 11 9 12 3 Z"/>',
+};
+function iconSvg(key){
+  const inner = ICONS[key];
+  if(!inner) return '';
+  return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${inner}</svg>`;
+}
+
 const UPGRADES = [
-  { id:'click1', name:'Reinforced Gloves', icon:'🧤', desc:'+1 per click', cost:80, type:'clickFlat', value:1, req:0 },
-  { id:'click2', name:'Steel Hammer', icon:'🔨', desc:'+4 per click', cost:400, type:'clickFlat', value:4, req:1 },
-  { id:'click3', name:'Jackhammer', icon:'⚒️', desc:'+12 per click', cost:2200, type:'clickFlat', value:12, req:2 },
-  { id:'click4', name:'Plasma Drill', icon:'🛰️', desc:'+45 per click', cost:15000, type:'clickFlat', value:45, req:3 },
-  { id:'click5', name:'Graviton Fist', icon:'💥', desc:'+180 per click', cost:95000, type:'clickFlat', value:180, req:4 },
-  { id:'crit1', name:'Lucky Strike', icon:'🍀', desc:'5% crit chance (x5)', cost:1200, type:'critChance', value:0.05, req:0 },
-  { id:'crit2', name:'Critical Mastery', icon:'🎯', desc:'+10% crit chance, crit x8', cost:18000, type:'critMult', value:8, req:5 },
-  { id:'mult1', name:'Efficient Blueprints', icon:'📐', desc:'All production x1.5', cost:5000, type:'globalMult', value:1.5, req:0 },
-  { id:'mult2', name:'Industrial Overclock', icon:'⚡', desc:'All production x2', cost:35000, type:'globalMult', value:2, req:7 },
-  { id:'mult3', name:'Quantum Efficiency', icon:'🔬', desc:'All production x2.5', cost:250000, type:'globalMult', value:2.5, req:8 },
-  { id:'autoClick', name:'Auto-Clicker Arm', icon:'🦾', desc:'Gain 15% of BPS on each click', cost:8000, type:'autoClickPct', value:0.15, req:0 },
-  { id:'golden', name:'Golden Detector', icon:'🔍', desc:'Golden Blocks appear more often (2x) & last longer', cost:6000, type:'goldenBoost', value:2, req:0 },
+  { id:'click1', name:'Reinforced Gloves', icon:'glove', desc:'+1 per click', cost:80, type:'clickFlat', value:1, req:0 },
+  { id:'click2', name:'Steel Hammer', icon:'hammer', desc:'+4 per click', cost:400, type:'clickFlat', value:4, req:1 },
+  { id:'click3', name:'Jackhammer', icon:'jackhammer', desc:'+12 per click', cost:2200, type:'clickFlat', value:12, req:2 },
+  { id:'click4', name:'Plasma Drill', icon:'drill', desc:'+45 per click', cost:15000, type:'clickFlat', value:45, req:3 },
+  { id:'click5', name:'Graviton Fist', icon:'fist', desc:'+180 per click', cost:95000, type:'clickFlat', value:180, req:4 },
+  { id:'crit1', name:'Lucky Strike', icon:'clover', desc:'5% crit chance (x5)', cost:1200, type:'critChance', value:0.05, req:0 },
+  { id:'crit2', name:'Critical Mastery', icon:'target', desc:'+10% crit chance, crit x8', cost:18000, type:'critMult', value:8, req:5 },
+  { id:'mult1', name:'Efficient Blueprints', icon:'ruler', desc:'All production x1.5', cost:5000, type:'globalMult', value:1.5, req:0 },
+  { id:'mult2', name:'Industrial Overclock', icon:'bolt', desc:'All production x2', cost:35000, type:'globalMult', value:2, req:7 },
+  { id:'mult3', name:'Quantum Efficiency', icon:'gauge', desc:'All production x2.5', cost:250000, type:'globalMult', value:2.5, req:8 },
+  { id:'autoClick', name:'Auto-Clicker Arm', icon:'arm', desc:'Gain 15% of BPS on each click', cost:8000, type:'autoClickPct', value:0.15, req:0 },
+  { id:'golden', name:'Golden Detector', icon:'lens', desc:'Golden Blocks appear more often (2x) & last longer', cost:6000, type:'goldenBoost', value:2, req:0 },
 ];
 
 const BLUEPRINT_SHOP = [
-  { id:'bpClick', name:'Blueprint Hands', icon:'✋', desc:'+2 base click per level', cost:1, costScale:1.6, type:'bpClick', value:2, max:25 },
-  { id:'bpBps', name:'Blueprint Engine', icon:'⚙️', desc:'+10% BPS per level', cost:2, costScale:1.7, type:'bpBpsMult', value:0.10, max:20 },
-  { id:'bpDiscount', name:'Supply Chain', icon:'📦', desc:'-3% building cost per level', cost:3, costScale:1.8, type:'bpDiscount', value:0.03, max:15 },
-  { id:'bpGolden', name:'Golden Fortune', icon:'✨', desc:'+25% Golden Block reward', cost:5, costScale:2.0, type:'bpGolden', value:0.25, max:10 },
+  { id:'bpClick', name:'Blueprint Hands', icon:'hand', desc:'+2 base click per level', cost:1, costScale:1.6, type:'bpClick', value:2, max:25 },
+  { id:'bpBps', name:'Blueprint Engine', icon:'gear', desc:'+10% BPS per level', cost:2, costScale:1.7, type:'bpBpsMult', value:0.10, max:20 },
+  { id:'bpDiscount', name:'Supply Chain', icon:'box', desc:'-3% building cost per level', cost:3, costScale:1.8, type:'bpDiscount', value:0.03, max:15 },
+  { id:'bpGolden', name:'Golden Fortune', icon:'sparkle', desc:'+25% Golden Block reward', cost:5, costScale:2.0, type:'bpGolden', value:0.25, max:10 },
 ];
 
 const SAVE_KEY = 'baseblocks_save_v2';
@@ -315,7 +348,7 @@ function renderGenerators(){
     const card=document.createElement('div');
     card.className='shop-card'+(affordable?' affordable':'')+(state.blocks < cost*0.2?' disabled':'');
     card.innerHTML=`
-      <div class="shop-icon gen">${g.icon}</div>
+      <div class="shop-icon gen">${iconSvg(g.icon)}</div>
       <div class="shop-info">
         <div class="shop-name">${g.name} <span class="shop-owned">x${owned}</span></div>
         <div class="shop-desc">${g.desc}</div>
@@ -342,7 +375,7 @@ function renderUpgrades(){
       card.className='shop-card';
       card.style.opacity='.6';
       card.innerHTML=`
-        <div class="shop-icon upg" style="background:linear-gradient(135deg, rgba(46,232,158,.2), rgba(46,232,158,.08));border-color:rgba(46,232,158,.3)">${u.icon}</div>
+        <div class="shop-icon upg" style="background:linear-gradient(135deg, rgba(46,232,158,.2), rgba(46,232,158,.08));border-color:rgba(46,232,158,.3)">${iconSvg(u.icon)}</div>
         <div class="shop-info">
           <div class="shop-name">${u.name} <span class="shop-owned" style="background:rgba(46,232,158,.15);color:#b6ffdf;border-color:rgba(46,232,158,.25)">OWNED ✓</span></div>
           <div class="shop-desc">${u.desc}</div>
@@ -358,7 +391,7 @@ function renderUpgrades(){
     const card=document.createElement('div');
     card.className='shop-card'+(affordable?' affordable':'');
     card.innerHTML=`
-      <div class="shop-icon upg">${u.icon}</div>
+      <div class="shop-icon upg">${iconSvg(u.icon)}</div>
       <div class="shop-info">
         <div class="shop-name">${u.name}</div>
         <div class="shop-desc">${u.desc}</div>
@@ -390,7 +423,7 @@ function renderBlueprintShop(){
     card.className='blueprint-card';
     card.style.opacity=maxed?'.6':'1';
     card.innerHTML=`
-      <div class="b-icon">${b.icon}</div>
+      <div class="b-icon">${iconSvg(b.icon)}</div>
       <div>
         <h5>${b.name} <span class="shop-owned" style="font-size:.65rem">Lv ${lvl}/${b.max}</span></h5>
         <p>${b.desc} <b style="color:var(--muted)">(${maxed?'MAX':'+'+b.value+(b.type.includes('Mult')?'×':'')+' / lvl'})</b></p>
@@ -724,7 +757,7 @@ function checkAchievements(gain){
   checks.forEach(([cond,msg])=>{
     if(cond && !achievements.has(msg)){
       achievements.add(msg);
-      toast('🏆 '+msg);
+      toast(msg);
     }
   });
 }

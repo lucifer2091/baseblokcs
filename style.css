@@ -584,5 +584,16 @@ textarea{width:100%;padding:10px 12px;border-radius:var(--radius-sm);border:1px 
   .topstats .topstat:first-child{display:none}
 }
 
+/* ---------- Custom icon SVGs ---------- */
+.shop-icon svg, .b-icon svg{width:26px;height:26px;display:block}
+.shop-icon.gen{color:#dbe7ff}
+.shop-icon.upg{color:#ffe2b8}
+.b-icon{color:#cfe0ff}
+.tab svg{width:16px;height:16px;display:block}
+.badge-icon svg{width:12px;height:12px;display:block}
+.prestige-icon svg{width:26px;height:26px}
+.golden-block svg{width:24px;height:24px}
+.banner-icon{width:18px;height:18px;vertical-align:-4px;margin-right:5px;flex:none}
+
 /* Utility */
 .hidden{display:none !important}
