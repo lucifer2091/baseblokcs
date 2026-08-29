@@ -44,12 +44,15 @@ function iconSvg(key){
   return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${inner}</svg>`;
 }
 
+const CLICK_UPGRADES = [
+  { id:'click1', name:'Reinforced Gloves', icon:'glove', desc:'+1 per click', baseCost:50, costScale:1.65, value:1, max:100 },
+  { id:'click2', name:'Steel Hammer', icon:'hammer', desc:'+4 per click', baseCost:300, costScale:1.70, value:4, max:80 },
+  { id:'click3', name:'Jackhammer', icon:'jackhammer', desc:'+10 per click', baseCost:1800, costScale:1.75, value:10, max:60 },
+  { id:'click4', name:'Plasma Drill', icon:'drill', desc:'+45 per click', baseCost:11000, costScale:1.80, value:45, max:40 },
+  { id:'click5', name:'Graviton Fist', icon:'fist', desc:'+180 per click', baseCost:75000, costScale:1.85, value:180, max:30 },
+];
+
 const UPGRADES = [
-  { id:'click1', name:'Reinforced Gloves', icon:'glove', desc:'+1 per click', cost:50, type:'clickFlat', value:1, req:0 },
-  { id:'click2', name:'Steel Hammer', icon:'hammer', desc:'+4 per click', cost:300, type:'clickFlat', value:4, req:1 },
-  { id:'click3', name:'Jackhammer', icon:'jackhammer', desc:'+10 per click', cost:1800, type:'clickFlat', value:10, req:2 },
-  { id:'click4', name:'Plasma Drill', icon:'drill', desc:'+45 per click', cost:11000, type:'clickFlat', value:45, req:3 },
-  { id:'click5', name:'Graviton Fist', icon:'fist', desc:'+180 per click', cost:75000, type:'clickFlat', value:180, req:4 },
   { id:'crit1', name:'Lucky Strike', icon:'clover', desc:'5% crit chance (x5)', cost:900, type:'critChance', value:0.05, req:0 },
   { id:'crit2', name:'Critical Mastery', icon:'target', desc:'+10% crit chance, crit x7', cost:14000, type:'critMult', value:7, req:5 },
   { id:'mult1', name:'Efficient Blueprints', icon:'ruler', desc:'All production x1.5', cost:3800, type:'globalMult', value:1.5, req:0 },
@@ -124,6 +127,7 @@ const defaultState = () => ({
   playTime:0,
   generators:{},
   upgrades:{},
+  clickUpgradeLevels:{},
   blueprintLevels:{},
   achievementsUnlocked:[],
   stats:{ goldenCaught:0, crits:0 },
@@ -169,6 +173,7 @@ const clickFxLayer=document.getElementById('click-fx-layer');
 const crackLayer=document.getElementById('crack-layer');
 const goldenBlock=document.getElementById('golden-block');
 const genList=document.getElementById('generators-list');
+const clickList=document.getElementById('click-upgrades-list');
 const upgList=document.getElementById('upgrades-list');
 const bpShopDiv=document.getElementById('blueprint-shop');
 const achGrid=document.getElementById('achievements-grid');
@@ -186,10 +191,18 @@ function load(){
     // ensure nested objects
     state.generators = parsed.generators || {};
     state.upgrades = parsed.upgrades || {};
+    state.clickUpgradeLevels = parsed.clickUpgradeLevels || {};
     state.blueprintLevels = parsed.blueprintLevels || {};
     state.settings = {...defaultState().settings, ...(parsed.settings||{})};
     state.achievementsUnlocked = Array.isArray(parsed.achievementsUnlocked) ? parsed.achievementsUnlocked : [];
     state.stats = { ...defaultState().stats, ...(parsed.stats||{}) };
+    // migrate old one-time click upgrades (from UPGRADES) to new multi-buy levels
+    for(const cu of CLICK_UPGRADES){
+      if(parsed.upgrades && parsed.upgrades[cu.id]){
+        if(!state.clickUpgradeLevels[cu.id]) state.clickUpgradeLevels[cu.id]=1;
+        delete state.upgrades[cu.id];
+      }
+    }
     // offline progress
     const now=Date.now();
     const dt = Math.min((now - (state.lastSave||now))/1000, 24*3600);
@@ -219,11 +232,15 @@ function recalc(){
   critMult=5;
   autoClickPct=0;
   let goldenBoost=1;
-  // upgrades
+  // click upgrades (multi-buy) — now grouped with CPS generators
+  for(const cu of CLICK_UPGRADES){
+    const lvl = state.clickUpgradeLevels[cu.id]||0;
+    flatClick += lvl * cu.value;
+  }
+  // other upgrades (one-time)
   for(const u of UPGRADES){
     if(!state.upgrades[u.id]) continue;
-    if(u.type==='clickFlat') flatClick+=u.value;
-    else if(u.type==='globalMult') globalMult*=u.value;
+    if(u.type==='globalMult') globalMult*=u.value;
     else if(u.type==='critChance') critChance+=u.value;
     else if(u.type==='critMult') critMult=u.value;
     else if(u.type==='autoClickPct') autoClickPct+=u.value;
@@ -266,6 +283,12 @@ function recalc(){
 function getGenCost(g){
   const owned=state.generators[g.id]||0;
   let cost = g.baseCost * Math.pow(g.costMult, owned);
+  cost *= (1 - discount);
+  return Math.ceil(cost);
+}
+function getClickUpgradeCost(cu){
+  const lvl = state.clickUpgradeLevels[cu.id]||0;
+  let cost = cu.baseCost * Math.pow(cu.costScale, lvl);
   cost *= (1 - discount);
   return Math.ceil(cost);
 }
@@ -428,6 +451,36 @@ function renderGenerators(){
     genList.appendChild(card);
   });
 }
+function renderClickUpgrades(){
+  if(!clickList) return;
+  clickList.innerHTML='';
+  CLICK_UPGRADES.forEach(cu=>{
+    const lvl = state.clickUpgradeLevels[cu.id]||0;
+    const maxed = lvl >= cu.max;
+    const cost = getClickUpgradeCost(cu);
+    const affordable = state.blocks >= cost && !maxed;
+    const totalBonus = lvl * cu.value;
+    const card=document.createElement('div');
+    card.className='shop-card'+(affordable?' affordable':'')+(maxed?'':'')+(state.blocks < cost*0.2 && !maxed ?' disabled':'');
+    if(maxed) card.style.opacity='.6';
+    card.innerHTML=`
+      <div class="shop-icon upg" style="background:linear-gradient(135deg, rgba(255,158,44,.16), rgba(240,116,27,.12));border-color:rgba(255,158,44,.30)">${iconSvg(cu.icon)}</div>
+      <div class="shop-info">
+        <div class="shop-name">${cu.name} <span class="shop-owned">x${lvl}</span> ${maxed?'<span class="stamp">MAX</span>':''}</div>
+        <div class="shop-desc">${cu.desc} <span style="color:var(--muted)">(total +${formatNum(totalBonus,true)})</span></div>
+        <div class="shop-meta">
+          <span class="mult">+${cu.value}/click each</span>
+          <span class="mono" style="color:var(--dim)">${lvl}/${cu.max} owned</span>
+        </div>
+      </div>
+      <div class="shop-buy">
+        <div class="price ${maxed?'expensive':affordable?'affordable':'expensive'}"><span class="cube-mini"></span> ${maxed?'MAX':formatNum(cost,true)}</div>
+        <button class="buy-btn ${affordable?'primary':''}" data-buy-click="${cu.id}" ${maxed?'disabled':''}>${maxed?'MAXED':'BUY'}</button>
+      </div>
+    `;
+    clickList.appendChild(card);
+  });
+}
 function renderUpgrades(){
   upgList.innerHTML='';
   let anyAvailable=false;
@@ -501,6 +554,7 @@ function renderBlueprintShop(){
 }
 
 function renderAllShops(){
+  renderClickUpgrades();
   renderGenerators();
   renderUpgrades();
   renderBlueprintShop();
@@ -639,6 +693,22 @@ function buyGenerator(id){
   checkAchievements();
   toast(`Built ${g.name}!`);
 }
+function buyClickUpgrade(id){
+  const cu=CLICK_UPGRADES.find(x=>x.id===id);
+  if(!cu) return;
+  const lvl=state.clickUpgradeLevels[id]||0;
+  if(lvl>=cu.max){ toast('MAX level reached'); return; }
+  const cost=getClickUpgradeCost(cu);
+  if(state.blocks<cost){ toast(`Need ${formatNum(cost,true)} blocks`); shakeBuy(); return; }
+  state.blocks-=cost;
+  state.clickUpgradeLevels[id]=lvl+1;
+  recalc();
+  save();
+  renderAllShops();
+  updateUI();
+  checkAchievements();
+  toast(`${cu.name} Lv ${lvl+1}! +${cu.value}/click`);
+}
 function buyUpgrade(id){
   const u=UPGRADES.find(x=>x.id===id);
   if(!u || state.upgrades[id]) return;
@@ -692,6 +762,7 @@ function doPrestige(){
   state.blocks=0;
   state.generators={};
   state.upgrades={};
+  state.clickUpgradeLevels={};
   // keep blueprintLevels, blueprints, totalEver, playTime
   recalc();
   save();
@@ -754,6 +825,11 @@ document.addEventListener('click', (e)=>{
   const genBtn=e.target.closest('[data-buy-gen]');
   if(genBtn){
     buyGenerator(genBtn.dataset.buyGen);
+    return;
+  }
+  const clickBtn=e.target.closest('[data-buy-click]');
+  if(clickBtn){
+    buyClickUpgrade(clickBtn.dataset.buyClick);
     return;
   }
   const upgBtn=e.target.closest('[data-buy-upg]');
