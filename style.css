@@ -222,21 +222,21 @@ body{
 .view-pad{padding:18px;display:flex;flex-direction:column;gap:14px;max-width:600px}
 .view-title{font-family:var(--font-ui);font-weight:700;font-size:1.15rem;letter-spacing:.01em}
 
-/* Achievements */
-.ach-list{display:flex;flex-direction:column;gap:8px;margin-top:4px}
+/* Achievements — milestones as squircles */
+.ach-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px;margin-top:6px}
 .ach{
-  display:flex;gap:12px;align-items:center;
-  padding:11px 12px;border:1px solid var(--border);border-radius:7px;
+  display:flex;flex-direction:column;align-items:center;text-align:center;gap:10px;
+  padding:18px 12px;border:1px solid var(--border);border-radius:26px;
   background:var(--panel-2);transition:.15s;
 }
-.ach.got{border-color:rgba(58,217,138,.35);background:linear-gradient(180deg,rgba(58,217,138,.08),var(--panel-2))}
-.ach-icon{width:34px;height:34px;flex:none;display:grid;place-items:center;border-radius:8px;background:var(--panel-3);border:1px solid var(--border-2);color:var(--dim)}
-.ach-icon svg{width:18px;height:18px}
-.ach.got .ach-icon{color:var(--green);border-color:rgba(58,217,138,.4)}
-.ach-info{flex:1;min-width:0}
-.ach-name{font-weight:700;font-size:.86rem}
+.ach.got{border-color:rgba(58,217,138,.4);background:linear-gradient(180deg,rgba(58,217,138,.1),var(--panel-2))}
+.ach-icon{width:52px;height:52px;flex:none;display:grid;place-items:center;border-radius:30%;background:var(--panel-3);border:1px solid var(--border-2);color:var(--dim)}
+.ach-icon svg{width:24px;height:24px}
+.ach.got .ach-icon{color:var(--green);border-color:rgba(58,217,138,.45);background:rgba(58,217,138,.08)}
+.ach-info{flex:none;min-width:0}
+.ach-name{font-weight:700;font-size:.82rem;line-height:1.25}
 .ach:not(.got) .ach-name{color:var(--muted)}
-.ach-state{font-family:var(--font-mono);font-size:.56rem;letter-spacing:.12em;color:var(--dim);text-transform:uppercase;margin-top:2px}
+.ach-state{font-family:var(--font-mono);font-size:.54rem;letter-spacing:.14em;color:var(--dim);text-transform:uppercase;margin-top:5px}
 .ach.got .ach-state{color:var(--green)}
 
 /* Mobile: taskbar becomes a bottom dock */
