@@ -170,6 +170,7 @@ function load(){
     state.blueprintLevels = parsed.blueprintLevels || {};
     state.settings = {...defaultState().settings, ...(parsed.settings||{})};
     state.achievementsUnlocked = Array.isArray(parsed.achievementsUnlocked) ? parsed.achievementsUnlocked : [];
+    achievements = new Set(state.achievementsUnlocked);
     state.stats = { ...defaultState().stats, ...(parsed.stats||{}) };
     // migrate old one-time click upgrades (from UPGRADES) to new multi-buy levels
     for(const cu of CLICK_UPGRADES){
@@ -238,6 +239,10 @@ function recalc(){
   // prestige multiplier — balanced to 12% per BP (down from 15%)
   const prestigeMult = 1 + state.blueprints * PRESTIGE_MULT_PER_BP;
   globalMult *= prestigeMult * bpBpsMult;
+  // achievement bonuses
+  for(const a of ACHIEVEMENTS){
+    if(a.bonus && achievements.has(a.id)) globalMult *= a.bonus;
+  }
   // cap crit
   critChance = Math.min(critChance,0.45);
   // bps
@@ -870,7 +875,7 @@ const ACHIEVEMENTS = [
   { id:'te10k',      name:'10k Stacked',     how:'Stack 10,000 total blocks',       test:()=>state.totalEver>=10000 },
   { id:'b10',        name:'10 Buildings',    how:'Own 10 generators',               test:()=>Object.values(state.generators).reduce((a,b)=>a+b,0)>=10 },
   { id:'bps100',     name:'100 BPS',         how:'Reach 100 blocks per second',     test:()=>bps>=100 },
-  { id:'bp1',        name:'First Blueprint', how:'Gain your first Blueprint',       test:()=>state.blueprints>=1 },
+  { id:'bp1',        name:'First Blueprint', how:'Gain your first Blueprint',       test:()=>state.blueprints>=1, bonus:1.5 },
 ];
 const ACH_CHECK='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>';
 const ACH_LOCK='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>';
@@ -890,7 +895,9 @@ function updateAchievements(){
   ACHIEVEMENTS.forEach(a=>{
     if(a.test() && !achievements.has(a.id)){
       achievements.add(a.id);
+      if(!state.achievementsUnlocked.includes(a.id)) state.achievementsUnlocked.push(a.id);
       toast(a.name);
+      if(a.bonus){ recalc(); save(); updateUI(); }
     }
   });
   const view=document.getElementById('view-achievements');
