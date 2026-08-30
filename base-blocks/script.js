@@ -69,27 +69,6 @@ const BLUEPRINT_SHOP = [
   { id:'bpGolden', name:'Golden Fortune', icon:'sparkle', desc:'+25% Golden Block reward', cost:5, costScale:2.05, type:'bpGolden', value:0.25, max:10 },
 ];
 
-const ACHIEVEMENTS = [
-  { id:'firstClick', name:'First Block', desc:'Click the block once', icon:'hand', check:()=>state.clicks>=1 },
-  { id:'hundredClicks', name:'Click Frenzy', desc:'Reach 100 clicks', icon:'bolt', check:()=>state.clicks>=100 },
-  { id:'thousandClicks', name:'Click Storm', desc:'Reach 1,000 clicks', icon:'fist', check:()=>state.clicks>=1000 },
-  { id:'kBlocks', name:'Stacked', desc:'Own 1,000 blocks at once', icon:'box', check:()=>state.blocks>=1000 },
-  { id:'tenK', name:'Hoarder', desc:'Stack 10,000 total blocks', icon:'box', check:()=>state.totalEver>=10000 },
-  { id:'hundredK', name:'Magnate', desc:'Stack 100,000 total blocks', icon:'factory', check:()=>state.totalEver>=100000 },
-  { id:'million', name:'Millionaire', desc:'Stack 1,000,000 total blocks', icon:'forge', check:()=>state.totalEver>=1000000 },
-  { id:'tenBuildings', name:'Builder', desc:'Own 10 generators', icon:'gear', check:()=>Object.values(state.generators).reduce((a,b)=>a+b,0)>=10 },
-  { id:'fiftyBuildings', name:'Industrialist', desc:'Own 50 generators', icon:'gear', check:()=>Object.values(state.generators).reduce((a,b)=>a+b,0)>=50 },
-  { id:'tenBps', name:'Automation', desc:'Reach 10 BPS', icon:'gauge', check:()=>bps>=10 },
-  { id:'hundredBps', name:'Overdrive', desc:'Reach 100 BPS', icon:'gauge', check:()=>bps>=100 },
-  { id:'thousandBps', name:'Mega Factory', desc:'Reach 1,000 BPS', icon:'gauge', check:()=>bps>=1000 },
-  { id:'firstBP', name:'Blueprint Novice', desc:'Gain your first Blueprint', icon:'sparkle', check:()=>state.blueprints>=1 },
-  { id:'fiveBP', name:'Architect', desc:'Gain 5 Blueprints', icon:'trophy', check:()=>state.blueprints>=5 },
-  { id:'golden', name:'Golden Hunter', desc:'Catch a Golden Block', icon:'lens', check:()=>(state.stats?.goldenCaught||0)>=1 },
-  { id:'golden5', name:'Treasure Seeker', desc:'Catch 5 Golden Blocks', icon:'sparkle', check:()=>(state.stats?.goldenCaught||0)>=5 },
-  { id:'play10', name:'Dedicated', desc:'Play for 10 minutes', icon:'worker', check:()=>state.playTime>=600 },
-  { id:'crit', name:'Lucky Hit', desc:'Land a critical click', icon:'clover', check:()=>(state.stats?.crits||0)>=1 },
-];
-
 const SAVE_KEY = 'baseblocks_save_v2';
 const PRESTIGE_REQUIREMENT = 18000;
 const PRESTIGE_MULT_PER_BP = 0.12; // 12% per blueprint (was 15%)
@@ -176,10 +155,6 @@ const genList=document.getElementById('generators-list');
 const clickList=document.getElementById('click-upgrades-list');
 const upgList=document.getElementById('upgrades-list');
 const bpShopDiv=document.getElementById('blueprint-shop');
-const achGrid=document.getElementById('achievements-grid');
-const achCount=document.getElementById('ach-count');
-const achFill=document.getElementById('ach-progress-fill');
-const achText=document.getElementById('ach-progress-text');
 const toastStack=document.getElementById('toast-stack');
 
 function load(){
@@ -382,20 +357,7 @@ function updateUI(){
 
   // shop highlights will be updated via renderShop? But we can do inline price color
   updateShopAffordability();
-
-  // achievements header progress (light, no full re-render)
-  if(achCount && achFill && achText){
-    const total = ACHIEVEMENTS.length;
-    const unlockedCount = state.achievementsUnlocked.length;
-    achCount.textContent = `${unlockedCount} / ${total}`;
-    const pct = total ? Math.round(unlockedCount/total*100) : 0;
-    achFill.style.width = pct + '%';
-    achText.textContent = pct + '%';
-  }
-  // also check for new unlocks periodically (throttled elsewhere)
-  // we run a lightweight check every UI update — cheap (18 checks)
-  // but only toast/save on new unlocks inside checkAchievements
-  if(Math.random() < 0.08) checkAchievements();
+  updateAchievements();
 }
 
 function getClickPowerBase(){
@@ -631,7 +593,7 @@ function doClick(e){
   elBlocks.classList.remove('bump');
   void elBlocks.offsetWidth;
   elBlocks.classList.add('bump');
-  checkAchievements(gain);
+  updateAchievements();
 }
 
 function spawnFloater(gain, isCrit, e){
@@ -690,7 +652,7 @@ function buyGenerator(id){
   save();
   renderAllShops();
   updateUI();
-  checkAchievements();
+  updateAchievements();
   toast(`Built ${g.name}!`);
 }
 function buyClickUpgrade(id){
@@ -706,7 +668,7 @@ function buyClickUpgrade(id){
   save();
   renderAllShops();
   updateUI();
-  checkAchievements();
+  updateAchievements();
   toast(`${cu.name} Lv ${lvl+1}! +${cu.value}/click`);
 }
 function buyUpgrade(id){
@@ -723,7 +685,7 @@ function buyUpgrade(id){
   save();
   renderAllShops();
   updateUI();
-  checkAchievements();
+  updateAchievements();
   toast(`Unlocked ${u.name}!`);
 }
 function buyBlueprint(id){
@@ -742,7 +704,7 @@ function buyBlueprint(id){
   save();
   renderAllShops();
   updateUI();
-  checkAchievements();
+  updateAchievements();
   toast(`${b.name} Lv ${lvl+1}!`);
 }
 function shakeBuy(){
@@ -768,7 +730,7 @@ function doPrestige(){
   save();
   renderAllShops();
   updateUI();
-  checkAchievements();
+  updateAchievements();
   toast(`REINFORCED! +${gain} Blueprints ◆`);
   // celebration particles
   for(let i=0;i<18;i++){
@@ -813,7 +775,7 @@ goldenBlock.addEventListener('click', ()=>{
   recalc();
   updateUI();
   throttledRender();
-  checkAchievements();
+  updateAchievements();
   toast(`Golden Block! +${formatNum(final,true)} blocks ✦`);
   // burst particles
   for(let i=0;i<6;i++) spawnParticles(true);
@@ -844,16 +806,20 @@ document.addEventListener('click', (e)=>{
   }
 });
 
-// Tabs
-document.querySelectorAll('.tab').forEach(tab=>{
-  tab.addEventListener('click', ()=>{
-    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
-    tab.classList.add('active');
-    const id=tab.dataset.tab;
-    document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('active'));
-    document.getElementById('pane-'+id).classList.add('active');
-    if(id==='achievements') renderAchievements();
-  });
+// Taskbar navigation
+function showView(view, pane){
+  document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('active'));
+  if(pane) document.getElementById('pane-'+pane).classList.add('active');
+  document.querySelectorAll('.view').forEach(v=>v.classList.add('hidden'));
+  const target = pane ? 'view-play' : ('view-'+view);
+  const el=document.getElementById(target);
+  if(el) el.classList.remove('hidden');
+  document.querySelectorAll('.tb-item').forEach(b=>b.classList.remove('active'));
+  const sel = pane ? document.querySelector('.tb-item[data-pane="'+pane+'"]') : document.querySelector('.tb-item[data-view="'+view+'"]');
+  if(sel) sel.classList.add('active');
+}
+document.querySelectorAll('.tb-item').forEach(btn=>{
+  btn.addEventListener('click', ()=> showView(btn.dataset.view, btn.dataset.pane) );
 });
 
 // Prestige buttons
@@ -895,55 +861,44 @@ function toast(msg){
   setTimeout(()=>el.remove(), 3200);
 }
 
-// Achievements — viewable in Achievements tab, persisted in save
+// Achievements
+let achievements = new Set();
+const ACHIEVEMENTS = [
+  { id:'firstClick',  desc:'First Click — +1 block',      test:()=>state.clicks>=1 },
+  { id:'c100',       desc:'100 Clicks — keep stacking',   test:()=>state.clicks>=100 },
+  { id:'b1k',        desc:'1,000 Blocks — base rising',   test:()=>state.blocks>=1000 },
+  { id:'te10k',      desc:'10k Stacked — factory online', test:()=>state.totalEver>=10000 },
+  { id:'b10',        desc:'10 Buildings — automation',     test:()=>Object.values(state.generators).reduce((a,b)=>a+b,0)>=10 },
+  { id:'bps100',     desc:'100 BPS — production online',  test:()=>bps>=100 },
+  { id:'bp1',        desc:'First Blueprint — reinforced', test:()=>state.blueprints>=1 },
+];
+const ACH_CHECK='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>';
+const ACH_LOCK='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>';
 function renderAchievements(){
-  if(!achGrid) return;
-  const total = ACHIEVEMENTS.length;
-  const unlockedCount = state.achievementsUnlocked.length;
-  achCount.textContent = `${unlockedCount} / ${total}`;
-  const pct = total ? Math.round(unlockedCount/total*100) : 0;
-  achFill.style.width = pct + '%';
-  achText.textContent = pct + '%';
-  achGrid.innerHTML='';
+  const wrap=document.getElementById('achievements-list');
+  if(!wrap) return;
+  wrap.innerHTML='';
   ACHIEVEMENTS.forEach(a=>{
-    const isUnlocked = state.achievementsUnlocked.includes(a.id);
-    const card=document.createElement('div');
-    card.className='ach-card ' + (isUnlocked ? 'unlocked' : 'locked');
-    card.innerHTML=`
-      <div class="ach-icon">${iconSvg(a.icon)}</div>
-      <div class="ach-info">
-        <h5>${a.name}</h5>
-        <p>${a.desc}</p>
-      </div>
-      <span class="ach-status">${isUnlocked ? 'UNLOCKED' : 'LOCKED'}</span>
-    `;
-    achGrid.appendChild(card);
+    const got=achievements.has(a.id);
+    const el=document.createElement('div');
+    el.className='ach'+(got?' got':'');
+    el.innerHTML=`<div class="ach-icon">${got?ACH_CHECK:ACH_LOCK}</div><div class="ach-info"><div class="ach-name">${a.desc}</div><div class="ach-state">${got?'UNLOCKED':'LOCKED'}</div></div>`;
+    wrap.appendChild(el);
   });
 }
-
-function checkAchievements(){
-  let newly=0;
-  for(const a of ACHIEVEMENTS){
-    if(state.achievementsUnlocked.includes(a.id)) continue;
-    try{
-      if(a.check()){
-        state.achievementsUnlocked.push(a.id);
-        newly++;
-        toast(`🏆 ${a.name} — ${a.desc}`);
-      }
-    }catch{}
-  }
-  if(newly>0){
-    save();
-    renderAchievements();
-  }
+function updateAchievements(){
+  ACHIEVEMENTS.forEach(a=>{
+    if(a.test() && !achievements.has(a.id)){
+      achievements.add(a.id);
+      toast(a.desc);
+    }
+  });
+  const view=document.getElementById('view-achievements');
+  if(view && !view.classList.contains('hidden')) renderAchievements();
 }
 
-// Settings
-const settingsModal=document.getElementById('settings-modal');
-document.getElementById('settings-btn').addEventListener('click',()=> settingsModal.classList.remove('hidden'));
-document.getElementById('close-settings').addEventListener('click',()=> settingsModal.classList.add('hidden'));
-settingsModal.addEventListener('click',(e)=>{ if(e.target===settingsModal) settingsModal.classList.add('hidden') });
+// Settings (now a taskbar view, not a modal)
+document.getElementById('settings-btn').addEventListener('click',()=> showView('settings'));
 
 document.getElementById('toggle-particles').addEventListener('change', e=>{ state.settings.particles=e.target.checked; save(); });
 document.getElementById('toggle-shake').addEventListener('change', e=>{ state.settings.shake=e.target.checked; save(); });
@@ -956,7 +911,7 @@ document.getElementById('export-btn').addEventListener('click', ()=>{
   const str=btoa(JSON.stringify(state));
   document.getElementById('export-area').value=str;
   navigator.clipboard.writeText(str).then(()=>toast('Save copied to clipboard!')).catch(()=>toast('Save exported below'));
-  settingsModal.classList.remove('hidden');
+  showView('settings');
 });
 document.getElementById('import-btn').addEventListener('click', ()=>{
   const str=document.getElementById('import-input').value.trim();
@@ -1011,7 +966,8 @@ document.getElementById('toggle-numbers').checked=state.settings.compact;
 renderAllShops();
 renderAchievements();
 updateUI();
-checkAchievements();
+showView('play','generators');
+renderAchievements();
 scheduleGolden();
 loop();
 // fast tick for income + ui

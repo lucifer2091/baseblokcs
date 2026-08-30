@@ -60,224 +60,210 @@
         </div>
     </header>
 
-    <!-- Main Layout -->
+    <!-- Main Layout: taskbar + content -->
     <main class="layout">
-        <!-- LEFT: Click Area -->
-        <section class="panel panel-main">
-            <div class="counter-area">
-                <div class="counter-label">BLOCKS</div>
-                <div class="counter-value mono" id="blocks-display">0</div>
-                <div class="counter-sub mono" id="bps-display">0.0 blocks / sec</div>
-                <div class="counter-sub small" id="click-power-display">1 per click</div>
-                <div class="goal-meter" id="goal-meter">
-                    <div class="goal-meter-head">
-                        <span class="goal-label">Next Reinforce</span>
-                        <span class="goal-pct mono" id="goal-pct">0%</span>
-                    </div>
-                    <div class="goal-bar"><div class="goal-bar-fill" id="goal-fill"></div></div>
-                </div>
-            </div>
+        <nav class="taskbar" aria-label="Sections">
+            <div class="tb-brand"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M12 3 L20 12 L12 21 L4 12 Z"/></svg></div>
+            <button class="tb-item active" data-view="play" data-pane="generators">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><rect x="4" y="12" width="7" height="7"/><rect x="13" y="12" width="7" height="7"/><rect x="9" y="5" width="7" height="7"/></svg>
+                GEN
+            </button>
+            <button class="tb-item" data-view="play" data-pane="upgrades">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M13 3 L6 13 H11 L10 21 L18 10 H12 Z"/></svg>
+                UPS
+            </button>
+            <button class="tb-item" data-view="play" data-pane="prestige">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M12 3 L20 12 L12 21 L4 12 Z"/></svg>
+                BLUE
+            </button>
+            <div class="tb-spacer"></div>
+            <button class="tb-item" data-view="settings">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M19.1 4.9L17 7M7 17l-2.1 2.1"/></svg>
+                OPTS
+            </button>
+            <button class="tb-item" data-view="achievements">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><circle cx="12" cy="9" r="5"/><path d="M9 13 L8 21 L12 18 L16 21 L15 13"/></svg>
+                AWARDS
+            </button>
+        </nav>
 
-            <!-- The Block Button -->
-            <div class="block-stage" id="block-stage">
-                <div class="block-shadow"></div>
-                <button class="big-block" id="big-block" aria-label="Mine block">
-                    <div class="block-iso">
-                        <div class="iso-top"></div>
-                        <div class="iso-front">
-                            <div class="block-pattern"></div>
-                            <div class="block-highlight"></div>
-                        </div>
-                        <div class="iso-side">
-                            <div class="block-pattern dark"></div>
-                        </div>
-                        <div class="iso-crack" id="crack-layer"></div>
-                    </div>
-                    <div class="block-label">MINE</div>
-                </button>
-                <div class="click-fx-layer" id="click-fx-layer"></div>
-                <!-- Golden block -->
-                <button class="golden-block hidden" id="golden-block" title="Golden Block! +10% of bank"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M12 3 L20 12 L12 21 L4 12 Z"/></svg></button>
-            </div>
-
-            <div class="hint">Click or press [Space] to mine</div>
-
-            <!-- Mini stats -->
-            <div class="mini-stats">
-                <div class="mini-stat">
-                    <span class="mini-stat-num mono" id="stat-clicks">0</span>
-                    <span class="mini-stat-label">clicks</span>
-                </div>
-                <div class="mini-stat">
-                    <span class="mini-stat-num mono" id="stat-built">0</span>
-                    <span class="mini-stat-label">built</span>
-                </div>
-                <div class="mini-stat">
-                    <span class="mini-stat-num mono" id="stat-blueprints">0</span>
-                    <span class="mini-stat-label">blueprints</span>
-                </div>
-            </div>
-        </section>
-
-        <!-- RIGHT: Shop -->
-        <section class="panel panel-shop">
-            <div class="shop-tabs" id="shop-tabs">
-                <button class="tab active" data-tab="generators">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><rect x="4" y="12" width="7" height="7"/><rect x="13" y="12" width="7" height="7"/><rect x="9" y="5" width="7" height="7"/></svg>
-                    GENERATORS
-                </button>
-                <button class="tab" data-tab="upgrades">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M13 3 L6 13 H11 L10 21 L18 10 H12 Z"/></svg>
-                    UPGRADES
-                </button>
-                <button class="tab" data-tab="prestige">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M12 3 L20 12 L12 21 L4 12 Z"/></svg>
-                    BLUEPRINTS
-                </button>
-                <button class="tab" data-tab="achievements">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><path d="M6 5 H18 L17 12 H7 Z"/><path d="M6 7 H4 a4 4 0 0 0 4 6"/><path d="M18 7 H20 a4 4 0 0 1 -4 6"/><path d="M9 21 H15"/><path d="M12 13 V21"/></svg>
-                    ACHIEVEMENTS
-                </button>
-            </div>
-
-            <div class="shop-content">
-                <!-- Generators — now includes Click Power (multi-buy) with CPS -->
-                <div class="tab-pane active" id="pane-generators">
-                    <div class="shop-section">
-                        <div class="section-label">
-                            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M12 3 C13 9 15 11 21 12 C15 13 13 15 12 21 C11 15 9 13 3 12 C9 11 11 9 12 3 Z"/></svg>
-                            CLICK POWER — Buy multiple times
-                        </div>
-                        <div class="shop-list" id="click-upgrades-list"></div>
-                    </div>
-                    <div class="shop-section" style="margin-top:16px">
-                        <div class="section-label">
-                            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><rect x="4" y="12" width="7" height="7"/><rect x="13" y="12" width="7" height="7"/><rect x="9" y="5" width="7" height="7"/></svg>
-                            AUTOMATION — Generators (CPS)
-                        </div>
-                        <div class="shop-list" id="generators-list"></div>
-                    </div>
-                </div>
-
-                <!-- Upgrades -->
-                <div class="tab-pane" id="pane-upgrades">
-                    <div class="shop-list" id="upgrades-list"></div>
-                </div>
-
-                <!-- Prestige -->
-                <div class="tab-pane" id="pane-prestige">
-                    <div class="prestige-panel">
-                        <div class="prestige-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M12 3 L20 12 L12 21 L4 12 Z"/></svg></div>
-                        <h3>REINFORCE YOUR BASE</h3>
-                        <p>Demolish everything and keep <b>Blueprints</b>. Each Blueprint gives <b>+12% to all production</b> permanently. The higher you build, the more you earn.</p>
-                        <div class="prestige-stats">
-                            <div class="pstat">
-                                <span>Current Blueprints</span>
-                                <b class="mono" id="p-blue-current">0</b>
+        <div class="content">
+            <!-- PLAY VIEW (click area + shop) -->
+            <section class="view" id="view-play">
+                <!-- LEFT: Click Area -->
+                <section class="panel panel-main">
+                    <div class="counter-area">
+                        <div class="counter-label">BLOCKS</div>
+                        <div class="counter-value mono" id="blocks-display">0</div>
+                        <div class="counter-sub mono" id="bps-display">0.0 blocks / sec</div>
+                        <div class="counter-sub small" id="click-power-display">1 per click</div>
+                        <div class="goal-meter" id="goal-meter">
+                            <div class="goal-meter-head">
+                                <span class="goal-label">Next Reinforce</span>
+                                <span class="goal-pct mono" id="goal-pct">0%</span>
                             </div>
-                            <div class="pstat">
-                                <span>Multiplier</span>
-                                <b class="mono" id="p-mult">x1.00</b>
+                            <div class="goal-bar"><div class="goal-bar-fill" id="goal-fill"></div></div>
+                        </div>
+                    </div>
+
+                    <!-- The Block Button -->
+                    <div class="block-stage" id="block-stage">
+                        <div class="block-shadow"></div>
+                        <button class="big-block" id="big-block" aria-label="Mine block">
+                            <div class="block-iso">
+                                <div class="iso-top"></div>
+                                <div class="iso-front">
+                                    <div class="block-pattern"></div>
+                                    <div class="block-highlight"></div>
+                                </div>
+                                <div class="iso-side">
+                                    <div class="block-pattern dark"></div>
+                                </div>
+                                <div class="iso-crack" id="crack-layer"></div>
                             </div>
-                            <div class="pstat highlight">
-                                <span>On Reinforce</span>
-                                <b class="mono" id="p-on-reset">+0</b>
+                            <div class="block-label">MINE</div>
+                        </button>
+                        <div class="click-fx-layer" id="click-fx-layer"></div>
+                        <button class="golden-block hidden" id="golden-block" title="Golden Block! +10% of bank"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M12 3 L20 12 L12 21 L4 12 Z"/></svg></button>
+                    </div>
+
+                    <div class="hint">Click or press [Space] to mine</div>
+
+                    <!-- Mini stats -->
+                    <div class="mini-stats">
+                        <div class="mini-stat">
+                            <span class="mini-stat-num mono" id="stat-clicks">0</span>
+                            <span class="mini-stat-label">clicks</span>
+                        </div>
+                        <div class="mini-stat">
+                            <span class="mini-stat-num mono" id="stat-built">0</span>
+                            <span class="mini-stat-label">built</span>
+                        </div>
+                        <div class="mini-stat">
+                            <span class="mini-stat-num mono" id="stat-blueprints">0</span>
+                            <span class="mini-stat-label">blueprints</span>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- RIGHT: Shop -->
+                <section class="panel panel-shop">
+                    <div class="shop-content">
+                        <div class="tab-pane active" id="pane-generators">
+                            <div class="shop-section">
+                                <div class="section-label">
+                                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M12 3 C13 9 15 11 21 12 C15 13 13 15 12 21 C11 15 9 13 3 12 C9 11 11 9 12 3 Z"/></svg>
+                                    CLICK POWER — Buy multiple times
+                                </div>
+                                <div class="shop-list" id="click-upgrades-list"></div>
+                            </div>
+                            <div class="shop-section" style="margin-top:16px">
+                                <div class="section-label">
+                                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><rect x="4" y="12" width="7" height="7"/><rect x="13" y="12" width="7" height="7"/><rect x="9" y="5" width="7" height="7"/></svg>
+                                    AUTOMATION — Generators (CPS)
+                                </div>
+                                <div class="shop-list" id="generators-list"></div>
                             </div>
                         </div>
-                        <button class="prestige-big-btn" id="prestige-big-btn">REINFORCE NOW</button>
-                        <p class="prestige-req mono" id="prestige-req">Need 18,000 blocks to Reinforce</p>
-                        <div class="prestige-perks">
-                            <h4>Blueprint Shop</h4>
-                            <div id="blueprint-shop"></div>
+                        <div class="tab-pane" id="pane-upgrades">
+                            <div class="shop-list" id="upgrades-list"></div>
+                        </div>
+                        <div class="tab-pane" id="pane-prestige">
+                            <div class="prestige-panel">
+                                <div class="prestige-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M12 3 L20 12 L12 21 L4 12 Z"/></svg></div>
+                                <h3>REINFORCE YOUR BASE</h3>
+                                <p>Demolish everything and keep <b>Blueprints</b>. Each Blueprint gives <b>+12% to all production</b> permanently. The higher you build, the more you earn.</p>
+                                <div class="prestige-stats">
+                                    <div class="pstat">
+                                        <span>Current Blueprints</span>
+                                        <b class="mono" id="p-blue-current">0</b>
+                                    </div>
+                                    <div class="pstat">
+                                        <span>Multiplier</span>
+                                        <b class="mono" id="p-mult">x1.00</b>
+                                    </div>
+                                    <div class="pstat highlight">
+                                        <span>On Reinforce</span>
+                                        <b class="mono" id="p-on-reset">+0</b>
+                                    </div>
+                                </div>
+                                <button class="prestige-big-btn" id="prestige-big-btn">REINFORCE NOW</button>
+                                <p class="prestige-req mono" id="prestige-req">Need 18,000 blocks to Reinforce</p>
+                                <div class="prestige-perks">
+                                    <h4>Blueprint Shop</h4>
+                                    <div id="blueprint-shop"></div>
+                                </div>
+                            </div>
                         </div>
                     </div>
+                </section>
+            </section>
+
+            <!-- SETTINGS VIEW -->
+            <section class="panel view hidden" id="view-settings">
+                <div class="view-pad">
+                    <h2 class="view-title">Settings</h2>
+                    <label class="toggle">
+                        <input type="checkbox" id="toggle-particles" checked>
+                        <span>Particles & Floaters</span>
+                    </label>
+                    <label class="toggle">
+                        <input type="checkbox" id="toggle-shake" checked>
+                        <span>Screen Shake on Crit</span>
+                    </label>
+                    <label class="toggle">
+                        <input type="checkbox" id="toggle-numbers" checked>
+                        <span>Compact Numbers (K/M/B)</span>
+                    </label>
+
+                    <div class="settings-divider"></div>
+
+                    <div class="setting-row">
+                        <span>Save Data</span>
+                        <div style="display:flex;gap:8px;flex-wrap:wrap">
+                            <button id="save-btn" class="small-btn" style="flex:1;min-width:140px" title="Manual save (auto-saves every 10s)">SAVE NOW</button>
+                            <button id="export-btn" class="small-btn" style="flex:1;min-width:140px">EXPORT SAVE</button>
+                        </div>
+                        <p class="modal-hint" style="text-align:left;margin:0">Auto-saves every 10s. Export copies a code for backups.</p>
+                    </div>
+
+                    <div class="setting-row">
+                        <span>Import Save</span>
+                        <div class="import-row">
+                            <input id="import-input" placeholder="Paste save string..." />
+                            <button id="import-btn" class="small-btn">IMPORT</button>
+                        </div>
+                    </div>
+                    <div class="setting-row">
+                        <span>Export Output</span>
+                        <textarea id="export-area" readonly rows="3" placeholder="Click EXPORT SAVE to generate..."></textarea>
+                    </div>
+
+                    <div class="settings-divider"></div>
+
+                    <div class="setting-row">
+                        <span style="color:#ff8a8a">Danger Zone</span>
+                        <button id="reset-btn" class="danger-btn">WIPE SAVE — RESET EVERYTHING</button>
+                        <p style="font-size:.72rem;color:var(--dim);line-height:1.4">Permanently erases blocks, generators, upgrades, blueprints & playtime. Requires double confirmation. This cannot be undone.</p>
+                    </div>
+
+                    <p class="modal-hint">Your base is stored locally (localStorage). Balance patch v1.2 active.</p>
                 </div>
+            </section>
 
-                <!-- Achievements -->
-                <div class="tab-pane" id="pane-achievements">
-                    <div class="ach-header">
-                        <div class="ach-title">
-                            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><path d="M6 5 H18 L17 12 H7 Z"/><path d="M6 7 H4 a4 4 0 0 0 4 6"/><path d="M18 7 H20 a4 4 0 0 1 -4 6"/><path d="M9 21 H15"/><path d="M12 13 V21"/></svg>
-                            <span>ACHIEVEMENTS</span>
-                            <span class="mono ach-count" id="ach-count">0 / 0</span>
-                        </div>
-                        <div class="ach-progress-wrap">
-                            <div class="ach-progress-bar"><div class="ach-progress-fill" id="ach-progress-fill"></div></div>
-                            <span class="mono ach-progress-text" id="ach-progress-text">0%</span>
-                        </div>
-                    </div>
-                    <div class="ach-grid" id="achievements-grid">
-                        <!-- injected by JS -->
-                    </div>
-                    <p class="ach-hint mono">Unlock by clicking, building, and prestiging. Progress saves automatically.</p>
+            <!-- ACHIEVEMENTS VIEW -->
+            <section class="panel view hidden" id="view-achievements">
+                <div class="view-pad">
+                    <h2 class="view-title">Achievements</h2>
+                    <p class="modal-hint" style="text-align:left;margin:0 0 4px">Milestones you've hit while building. Keep stacking.</p>
+                    <div class="ach-list" id="achievements-list"></div>
                 </div>
-            </div>
-
-
-        </section>
+            </section>
+        </div>
     </main>
 
     <!-- Toast -->
     <div class="toast-stack" id="toast-stack"></div>
-
-    <!-- Settings Modal -->
-    <div class="modal-overlay hidden" id="settings-modal">
-        <div class="modal">
-            <div class="modal-head">
-                <h2>Settings</h2>
-                <button class="icon-btn" id="close-settings" aria-label="Close">
-                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
-                </button>
-            </div>
-            <div class="modal-body">
-                <label class="toggle">
-                    <input type="checkbox" id="toggle-particles" checked>
-                    <span>Particles & Floaters</span>
-                </label>
-                <label class="toggle">
-                    <input type="checkbox" id="toggle-shake" checked>
-                    <span>Screen Shake on Crit</span>
-                </label>
-                <label class="toggle">
-                    <input type="checkbox" id="toggle-numbers" checked>
-                    <span>Compact Numbers (K/M/B)</span>
-                </label>
-
-                <div class="settings-divider"></div>
-
-                <div class="setting-row">
-                    <span>Save Data</span>
-                    <div style="display:flex;gap:8px;flex-wrap:wrap">
-                        <button id="save-btn" class="small-btn" style="flex:1;min-width:140px" title="Manual save (auto-saves every 10s)">SAVE NOW</button>
-                        <button id="export-btn" class="small-btn" style="flex:1;min-width:140px">EXPORT SAVE</button>
-                    </div>
-                    <p class="modal-hint" style="text-align:left;margin:0">Auto-saves every 10s. Export copies a code for backups.</p>
-                </div>
-
-                <div class="setting-row">
-                    <span>Import Save</span>
-                    <div class="import-row">
-                        <input id="import-input" placeholder="Paste save string..." />
-                        <button id="import-btn" class="small-btn">IMPORT</button>
-                    </div>
-                </div>
-                <div class="setting-row">
-                    <span>Export Output</span>
-                    <textarea id="export-area" readonly rows="3" placeholder="Click EXPORT SAVE to generate..."></textarea>
-                </div>
-
-                <div class="settings-divider"></div>
-
-                <div class="setting-row">
-                    <span style="color:#ff8a8a">Danger Zone</span>
-                    <button id="reset-btn" class="danger-btn">WIPE SAVE — RESET EVERYTHING</button>
-                    <p style="font-size:.72rem;color:var(--dim);line-height:1.4">Permanently erases blocks, generators, upgrades, blueprints & playtime. Requires double confirmation. This cannot be undone.</p>
-                </div>
-
-                <p class="modal-hint">Your base is stored locally (localStorage). Balance patch v1.2 active.</p>
-            </div>
-        </div>
-    </div>
 
     <script src="script.js"></script>
 </body>
