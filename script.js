@@ -864,13 +864,13 @@ function toast(msg){
 // Achievements
 let achievements = new Set();
 const ACHIEVEMENTS = [
-  { id:'firstClick',  desc:'First Click — +1 block',      test:()=>state.clicks>=1 },
-  { id:'c100',       desc:'100 Clicks — keep stacking',   test:()=>state.clicks>=100 },
-  { id:'b1k',        desc:'1,000 Blocks — base rising',   test:()=>state.blocks>=1000 },
-  { id:'te10k',      desc:'10k Stacked — factory online', test:()=>state.totalEver>=10000 },
-  { id:'b10',        desc:'10 Buildings — automation',     test:()=>Object.values(state.generators).reduce((a,b)=>a+b,0)>=10 },
-  { id:'bps100',     desc:'100 BPS — production online',  test:()=>bps>=100 },
-  { id:'bp1',        desc:'First Blueprint — reinforced', test:()=>state.blueprints>=1 },
+  { id:'firstClick',  name:'First Click',     how:'Click the block once',           test:()=>state.clicks>=1 },
+  { id:'c100',       name:'100 Clicks',      how:'Reach 100 clicks',                test:()=>state.clicks>=100 },
+  { id:'b1k',        name:'1,000 Blocks',    how:'Hold 1,000 blocks at once',       test:()=>state.blocks>=1000 },
+  { id:'te10k',      name:'10k Stacked',     how:'Stack 10,000 total blocks',       test:()=>state.totalEver>=10000 },
+  { id:'b10',        name:'10 Buildings',    how:'Own 10 generators',               test:()=>Object.values(state.generators).reduce((a,b)=>a+b,0)>=10 },
+  { id:'bps100',     name:'100 BPS',         how:'Reach 100 blocks per second',     test:()=>bps>=100 },
+  { id:'bp1',        name:'First Blueprint', how:'Gain your first Blueprint',       test:()=>state.blueprints>=1 },
 ];
 const ACH_CHECK='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>';
 const ACH_LOCK='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>';
@@ -882,7 +882,7 @@ function renderAchievements(){
     const got=achievements.has(a.id);
     const el=document.createElement('div');
     el.className='ach'+(got?' got':'');
-    el.innerHTML=`<div class="ach-icon">${got?ACH_CHECK:ACH_LOCK}</div><div class="ach-info"><div class="ach-name">${a.desc}</div><div class="ach-state">${got?'UNLOCKED':'LOCKED'}</div></div>`;
+    el.innerHTML=`<div class="ach-icon">${got?ACH_CHECK:ACH_LOCK}</div><div class="ach-info"><div class="ach-name">${a.name}</div><div class="ach-how">${a.how}</div></div>`;
     wrap.appendChild(el);
   });
 }
@@ -890,7 +890,7 @@ function updateAchievements(){
   ACHIEVEMENTS.forEach(a=>{
     if(a.test() && !achievements.has(a.id)){
       achievements.add(a.id);
-      toast(a.desc);
+      toast(a.name);
     }
   });
   const view=document.getElementById('view-achievements');
