@@ -830,7 +830,7 @@ document.addEventListener('click', (e)=>{
   }
 });
 
-// Taskbar navigation
+// Taskbar navigation — non-generator panes take whole screen (no split with click area)
 function showView(view, pane){
   document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('active'));
   if(pane) document.getElementById('pane-'+pane).classList.add('active');
@@ -841,6 +841,15 @@ function showView(view, pane){
   document.querySelectorAll('.tb-item').forEach(b=>b.classList.remove('active'));
   const sel = pane ? document.querySelector('.tb-item[data-pane="'+pane+'"]') : document.querySelector('.tb-item[data-view="'+view+'"]');
   if(sel) sel.classList.add('active');
+  // anything other than baseblocks generator upgrades => whole screen
+  const playView=document.getElementById('view-play');
+  if(playView){
+    if(pane && pane !== 'generators'){
+      playView.classList.add('full-shop');
+    } else {
+      playView.classList.remove('full-shop');
+    }
+  }
 }
 document.querySelectorAll('.tb-item').forEach(btn=>{
   btn.addEventListener('click', ()=> showView(btn.dataset.view, btn.dataset.pane) );

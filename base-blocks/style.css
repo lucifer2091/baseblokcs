@@ -228,6 +228,9 @@ body{
 
 /* Play view keeps the two-column play layout */
 #view-play{display:grid;grid-template-columns:1.05fr .95fr;gap:18px;align-items:start}
+#view-play.full-shop{grid-template-columns:1fr}
+#view-play.full-shop .panel-main{display:none}
+#view-play.full-shop .panel-shop{grid-column:1 / -1}
 @media (max-width:980px){ #view-play{grid-template-columns:1fr} }
 
 /* Settings / Achievements panels */
