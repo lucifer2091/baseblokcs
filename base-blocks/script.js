@@ -2,12 +2,12 @@
 
 const GENERATORS = [
   { id:'worker', name:'Brick Layer', icon:'worker', desc:'Lays bricks by hand. Honest work.', baseCost:12, bps:0.8, costMult:1.16 },
-  { id:'miner', name:'Auto Miner', icon:'miner', desc:'Digs blocks automatically.', baseCost:90, bps:5, costMult:1.16 },
-  { id:'factory', name:'Block Factory', icon:'factory', desc:'Assembly line of blocks.', baseCost:450, bps:22, costMult:1.17 },
-  { id:'quarry', name:'Deep Quarry', icon:'quarry', desc:'Excavates massive chunks.', baseCost:2600, bps:110, costMult:1.18 },
-  { id:'printer', name:'3D Printer', icon:'printer', desc:'Prints blocks layer by layer.', baseCost:13500, bps:620, costMult:1.19 },
-  { id:'quantum', name:'Quantum Lab', icon:'quantum', desc:'Entangles blocks into existence.', baseCost:82000, bps:3400, costMult:1.20 },
-  { id:'forge', name:'Singularity Forge', icon:'forge', desc:'Forges blocks from spacetime.', baseCost:580000, bps:21000, costMult:1.21 },
+  { id:'miner', name:'Auto Miner', icon:'miner', desc:'Digs blocks automatically.', baseCost:90, bps:5, costMult:1.17 },
+  { id:'factory', name:'Block Factory', icon:'factory', desc:'Assembly line of blocks.', baseCost:450, bps:22, costMult:1.19 },
+  { id:'quarry', name:'Deep Quarry', icon:'quarry', desc:'Excavates massive chunks.', baseCost:2600, bps:105, costMult:1.21 },
+  { id:'printer', name:'3D Printer', icon:'printer', desc:'Prints blocks layer by layer.', baseCost:14000, bps:580, costMult:1.24 },
+  { id:'quantum', name:'Quantum Lab', icon:'quantum', desc:'Entangles blocks into existence.', baseCost:85000, bps:3100, costMult:1.27 },
+  { id:'forge', name:'Singularity Forge', icon:'forge', desc:'Forges blocks from spacetime.', baseCost:600000, bps:19000, costMult:1.30 },
 ];
 
 /* Custom icon set — hand-built SVG (24x24), tinted per section via currentColor.
@@ -70,8 +70,9 @@ const BLUEPRINT_SHOP = [
 ];
 
 const SAVE_KEY = 'baseblocks_save_v2';
-const PRESTIGE_REQUIREMENT = 18000;
-const PRESTIGE_MULT_PER_BP = 0.12; // 12% per blueprint (was 15%)
+const PRESTIGE_REQUIREMENT = 75000; // increased from 18k to slow early prestige spam
+const PRESTIGE_MULT_PER_BP = 0.08; // 8% per BP (was 12% → was 478k% at 39k BPs)
+const PRESTIGE_EXPONENT = 0.38; // was 0.5 sqrt — now diminishing (0.38) to prevent explosion
 
 function formatNum(n, compact=true){
   if(!compact){
@@ -146,6 +147,9 @@ const elPrestigeBanner=document.getElementById('prestige-banner');
 const elPrestigePreview=document.getElementById('prestige-preview');
 const elPrestigeBonusPreview=document.getElementById('prestige-bonus-preview');
 const elPrestigeBtn=document.getElementById('prestige-btn');
+const elBannerClose=document.getElementById('banner-close');
+let bannerDismissedGain = -1;
+let bannerAutoHideTimer = null;
 const bigBlock=document.getElementById('big-block');
 const blockStage=document.getElementById('block-stage');
 const clickFxLayer=document.getElementById('click-fx-layer');
@@ -287,9 +291,10 @@ function getGlobalMultWithoutPrestige(){
 function getPotentialBlueprints(){
   const total = state.totalEver;
   if(total < PRESTIGE_REQUIREMENT) return 0;
-  // Balanced: easier early prestige — 18k =>1, 72k=>2, 162k=>3, 288k=>4
-  // sqrt(total/18000)
-  return Math.floor(Math.sqrt(total / PRESTIGE_REQUIREMENT));
+  // Scaling fix: was sqrt(total/18k) → exploded to 39k BPs at high total.
+  // Now pow 0.38 with higher requirement: 75k=>1, 400k=>2, 1M=>3, 5M=>5, 50M=>10, 1B=>22
+  // Diminishing returns prevent the +478k% banner spam.
+  return Math.floor(Math.pow(total / PRESTIGE_REQUIREMENT, PRESTIGE_EXPONENT));
 }
 function getBlueprintsOnReset(){
   const totalPotential = getPotentialBlueprints();
@@ -314,20 +319,32 @@ function updateUI(){
   elStatBuilt.textContent = formatNum(totalBuilt, compact);
   elStatBlueprints.textContent = formatNum(state.blueprints, compact);
   elPrestigeBadge.textContent = `x${(state._prestigeMult||1).toFixed(2)}`;
-  // prestige banner — now 12% per BP
+  // prestige banner — dismissible + auto-hides after 12s so it doesn't stay plastered (was always visible at +478k%)
   const gain = getBlueprintsOnReset();
-  if(gain>0){
+  if(gain>0 && gain !== bannerDismissedGain){
     elPrestigeBanner.classList.remove('hidden');
-    elPrestigePreview.textContent = gain;
+    elPrestigePreview.textContent = formatNum(gain, compact);
     elPrestigeBonusPreview.textContent = Math.round(gain * PRESTIGE_MULT_PER_BP * 100)+'%';
-  }else{
+    if(!bannerAutoHideTimer){
+      clearTimeout(bannerAutoHideTimer);
+      bannerAutoHideTimer = setTimeout(()=>{
+        elPrestigeBanner.classList.add('hidden');
+        bannerAutoHideTimer=null;
+      }, 12000);
+    }
+  }else if(gain<=0){
+    elPrestigeBanner.classList.add('hidden');
+    bannerDismissedGain = -1;
+    clearTimeout(bannerAutoHideTimer);
+    bannerAutoHideTimer=null;
+  } else {
     elPrestigeBanner.classList.add('hidden');
   }
   // prestige pane stats
   document.getElementById('p-blue-current').textContent = state.blueprints;
   document.getElementById('p-mult').textContent = `x${(state._prestigeMult||1).toFixed(2)}`;
   document.getElementById('p-on-reset').textContent = `+${gain}`;
-  // Reinforce progress meter — "what am I working toward?"
+  // Reinforce progress meter — updated for new exponent (was tier² for sqrt)
   const gm=document.getElementById('goal-meter');
   const gf=document.getElementById('goal-fill');
   const gp=document.getElementById('goal-pct');
@@ -339,8 +356,8 @@ function updateUI(){
     gp.textContent='READY';
   }else{
     gm.classList.remove('ready');
-    const tierLow=PRESTIGE_REQUIREMENT*tier*tier;
-    const tierHigh=PRESTIGE_REQUIREMENT*(tier+1)*(tier+1);
+    const tierLow = PRESTIGE_REQUIREMENT * Math.pow(tier, 1/PRESTIGE_EXPONENT);
+    const tierHigh = PRESTIGE_REQUIREMENT * Math.pow(tier+1, 1/PRESTIGE_EXPONENT);
     goalPct=Math.max(0,Math.min(100,((state.totalEver-tierLow)/(tierHigh-tierLow))*100));
     gp.textContent=Math.floor(goalPct)+'%';
   }
@@ -832,6 +849,14 @@ document.querySelectorAll('.tb-item').forEach(btn=>{
 // Prestige buttons
 elPrestigeBtn.addEventListener('click', doPrestige);
 document.getElementById('prestige-big-btn').addEventListener('click', doPrestige);
+if(elBannerClose){
+  elBannerClose.addEventListener('click', ()=>{
+    bannerDismissedGain = getBlueprintsOnReset();
+    elPrestigeBanner.classList.add('hidden');
+    clearTimeout(bannerAutoHideTimer);
+    bannerAutoHideTimer=null;
+  });
+}
 
 // Ticks
 function tick(dt){

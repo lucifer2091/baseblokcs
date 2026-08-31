@@ -170,6 +170,18 @@ body{
 }
 .prestige-cta:hover{transform:translateY(-1px);box-shadow:0 4px 0 rgba(140,60,5,.6)}
 .prestige-cta:active{transform:translateY(2px);box-shadow:0 1px 0 rgba(140,60,5,.6)}
+.banner-close{
+  width:28px;height:28px;flex:none;
+  display:grid;place-items:center;
+  border:1px solid rgba(255,255,255,.12);
+  background:rgba(0,0,0,.18);
+  color:var(--text);
+  border-radius:6px;
+  cursor:pointer;
+  transition:.15s;
+  font-size:.85rem;line-height:1;
+}
+.banner-close:hover{background:rgba(0,0,0,.28);border-color:rgba(255,255,255,.2);transform:translateY(-1px)}
 
 /* ---------- Layout: taskbar + content ---------- */
 .layout{

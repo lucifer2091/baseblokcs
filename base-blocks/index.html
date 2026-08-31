@@ -51,11 +51,12 @@
                 </div>
             </div>
         </div>
-        <!-- prestige banner -->
+        <!-- prestige banner — dismissible + auto-hides after 12s so it doesn't stay plastered -->
         <div class="prestige-banner hidden" id="prestige-banner">
             <div class="prestige-banner-inner">
                 <span><svg class="banner-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4 v9"/><path d="M8 11 l4 -4 4 4"/><rect x="6" y="15" width="12" height="4" rx="1"/></svg> You can <strong>REINFORCE</strong> your base! Reset for <b id="prestige-preview">0</b> Blueprints (+<span id="prestige-bonus-preview">0%</span> permanent boost)</span>
                 <button class="prestige-cta" id="prestige-btn">REINFORCE BASE</button>
+                <button class="banner-close" id="banner-close" aria-label="Dismiss" title="Dismiss">✕</button>
             </div>
         </div>
     </header>
@@ -79,7 +80,7 @@
             <div class="tb-spacer"></div>
             <button class="tb-item" data-view="settings">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M19.1 4.9L17 7M7 17l-2.1 2.1"/></svg>
-                OPTS
+                SETTINGS
             </button>
             <button class="tb-item" data-view="achievements">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><circle cx="12" cy="9" r="5"/><path d="M9 13 L8 21 L12 18 L16 21 L15 13"/></svg>
@@ -172,7 +173,7 @@
                             <div class="prestige-panel">
                                 <div class="prestige-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M12 3 L20 12 L12 21 L4 12 Z"/></svg></div>
                                 <h3>REINFORCE YOUR BASE</h3>
-                                <p>Demolish everything and keep <b>Blueprints</b>. Each Blueprint gives <b>+12% to all production</b> permanently. The higher you build, the more you earn.</p>
+                                <p>Demolish everything and keep <b>Blueprints</b>. Each Blueprint gives <b>+8% to all production</b> permanently. The higher you build, the more you earn.</p>
                                 <div class="prestige-stats">
                                     <div class="pstat">
                                         <span>Current Blueprints</span>
@@ -188,7 +189,7 @@
                                     </div>
                                 </div>
                                 <button class="prestige-big-btn" id="prestige-big-btn">REINFORCE NOW</button>
-                                <p class="prestige-req mono" id="prestige-req">Need 18,000 blocks to Reinforce</p>
+                                <p class="prestige-req mono" id="prestige-req">Need 75,000 blocks to Reinforce</p>
                                 <div class="prestige-perks">
                                     <h4>Blueprint Shop</h4>
                                     <div id="blueprint-shop"></div>
