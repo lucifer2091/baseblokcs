@@ -191,8 +191,12 @@
                                 <button class="prestige-big-btn" id="prestige-big-btn">REINFORCE NOW</button>
                                 <p class="prestige-req mono" id="prestige-req">Need 75,000 blocks to Reinforce</p>
                                 <div class="prestige-perks">
-                                    <h4>Blueprint Shop</h4>
-                                    <div id="blueprint-shop"></div>
+                                    <button id="blueprint-shop-toggle" class="blueprint-shop-toggle locked" disabled>
+                                        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
+                                        <span id="blueprint-toggle-label">BLUEPRINT SHOP — Locked (Need 75k blocks)</span>
+                                        <span class="toggle-chevron">▸</span>
+                                    </button>
+                                    <div id="blueprint-shop" class="hidden"></div>
                                 </div>
                             </div>
                         </div>

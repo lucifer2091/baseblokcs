@@ -159,6 +159,8 @@ const genList=document.getElementById('generators-list');
 const clickList=document.getElementById('click-upgrades-list');
 const upgList=document.getElementById('upgrades-list');
 const bpShopDiv=document.getElementById('blueprint-shop');
+const elBlueprintToggle=document.getElementById('blueprint-shop-toggle');
+const elBlueprintToggleLabel=document.getElementById('blueprint-toggle-label');
 const toastStack=document.getElementById('toast-stack');
 
 function load(){
@@ -375,6 +377,23 @@ function updateUI(){
     if(need>0) reqEl.textContent=`Need ${formatNum(need,compact)} more lifetime blocks`;
     else reqEl.textContent=`Need ${formatNum(PRESTIGE_REQUIREMENT,compact)} lifetime blocks (you have ${formatNum(state.totalEver,compact)})`;
     reqEl.style.color='';
+  }
+
+  // blueprint shop — behind button, locked until 1 blueprint worth (75k)
+  if(elBlueprintToggle){
+    const unlocked = state.totalEver >= PRESTIGE_REQUIREMENT;
+    elBlueprintToggle.disabled = !unlocked;
+    elBlueprintToggle.classList.toggle('locked', !unlocked);
+    const chevron = elBlueprintToggle.querySelector('.toggle-chevron');
+    if(!unlocked){
+      elBlueprintToggleLabel.textContent = `BLUEPRINT SHOP — Locked (Need ${formatNum(PRESTIGE_REQUIREMENT,true)} blocks)`;
+      if(chevron) chevron.textContent = '🔒';
+      bpShopDiv.classList.add('hidden');
+    } else {
+      const isOpen = !bpShopDiv.classList.contains('hidden');
+      elBlueprintToggleLabel.textContent = isOpen ? 'BLUEPRINT SHOP — Hide' : 'BLUEPRINT SHOP — View Shop';
+      if(chevron) chevron.textContent = isOpen ? '▾' : '▸';
+    }
   }
 
   // shop highlights will be updated via renderShop? But we can do inline price color
@@ -864,6 +883,13 @@ if(elBannerClose){
     elPrestigeBanner.classList.add('hidden');
     clearTimeout(bannerAutoHideTimer);
     bannerAutoHideTimer=null;
+  });
+}
+if(elBlueprintToggle){
+  elBlueprintToggle.addEventListener('click', ()=>{
+    if(elBlueprintToggle.disabled) return;
+    bpShopDiv.classList.toggle('hidden');
+    updateUI();
   });
 }
 

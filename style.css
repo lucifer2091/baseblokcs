@@ -603,6 +603,22 @@ body{
 .blueprint-card h5{font-size:.84rem;font-weight:700;display:flex;align-items:center;gap:6px}
 .blueprint-card p{font-size:.72rem;color:var(--muted);margin:2px 0 0;line-height:1.3}
 
+.blueprint-shop-toggle{
+  width:100%;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  padding:12px 14px;
+  border-radius:7px;
+  border:1px solid var(--border-2);
+  background:var(--panel-2);
+  color:var(--text);
+  font-family:var(--font-ui);font-weight:700;font-size:.78rem;letter-spacing:.04em;
+  cursor:pointer;transition:.15s;
+}
+.blueprint-shop-toggle:hover:not(:disabled){background:var(--panel-3);border-color:var(--accent);transform:translateY(-1px)}
+.blueprint-shop-toggle:disabled{opacity:.55;cursor:not-allowed;filter:grayscale(.3)}
+.blueprint-shop-toggle.locked{border-color:var(--border);color:var(--muted)}
+.blueprint-shop-toggle .toggle-chevron{margin-left:auto;font-size:.9rem;flex:none}
+
 /* Achievements */
 .ach-header{
   background:var(--panel-2);
