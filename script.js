@@ -64,7 +64,7 @@ const UPGRADES = [
 
 const BLUEPRINT_SHOP = [
   { id:'bpClick', name:'Blueprint Hands', icon:'hand', desc:'+2 base click per level', cost:1, costScale:1.65, type:'bpClick', value:2, max:25 },
-  { id:'bpBps', name:'Blueprint Engine', icon:'gear', desc:'+10% BPS per level', cost:2, costScale:1.75, type:'bpBpsMult', value:0.10, max:20 },
+  { id:'bpBps', name:'Blueprint Engine', icon:'gear', desc:'x1.1 BPS per level', cost:2, costScale:1.75, type:'bpBpsMult', value:1.1, max:20 },
   { id:'bpDiscount', name:'Supply Chain', icon:'box', desc:'-3% building cost per level', cost:3, costScale:1.85, type:'bpDiscount', value:0.03, max:15 },
   { id:'bpGolden', name:'Golden Fortune', icon:'sparkle', desc:'+25% Golden Block reward', cost:5, costScale:2.05, type:'bpGolden', value:0.25, max:10 },
 ];
@@ -222,7 +222,7 @@ function recalc(){
     else if(u.type==='autoClickPct') autoClickPct+=u.value;
     else if(u.type==='goldenBoost') goldenBoost*=u.value;
   }
-  // blueprint shop
+  // blueprint shop — Blueprint Engine is now x1.1 multiplicative (was +0.10 additive)
   bpClickBonus=0;
   bpBpsMult=1;
   discount=0;
@@ -230,7 +230,7 @@ function recalc(){
   for(const b of BLUEPRINT_SHOP){
     const lvl=state.blueprintLevels[b.id]||0;
     if(b.type==='bpClick') bpClickBonus+= b.value*lvl;
-    else if(b.type==='bpBpsMult') bpBpsMult+= b.value*lvl;
+    else if(b.type==='bpBpsMult') bpBpsMult *= Math.pow(b.value, lvl);
     else if(b.type==='bpDiscount') discount+= b.value*lvl;
     else if(b.type==='bpGolden') goldenBpMult+= b.value*lvl;
   }
@@ -505,11 +505,13 @@ function renderBlueprintShop(){
     const card=document.createElement('div');
     card.className='blueprint-card';
     card.style.opacity=maxed?'.6':'1';
+    // Blueprint Engine now x1.1 multiplicative — show as x1.1 not +1.1
+    const displayVal = b.id==='bpBps' ? `x${b.value}` : `+${b.value}${b.type.includes('Mult')?'×':''}`;
     card.innerHTML=`
       <div class="b-icon">${iconSvg(b.icon)}</div>
       <div>
         <h5>${b.name} <span class="shop-owned" style="font-size:.65rem">Lv ${lvl}/${b.max}</span></h5>
-        <p>${b.desc} <b style="color:var(--muted)">(${maxed?'MAX':'+'+b.value+(b.type.includes('Mult')?'×':'')+' / lvl'})</b></p>
+        <p>${b.desc} <b style="color:var(--muted)">(${maxed?'MAX':displayVal+' / lvl'})</b></p>
       </div>
       <div style="text-align:right;min-width:90px">
         <div style="font-family:'JetBrains Mono',monospace;font-weight:800;font-size:.85rem;color:${canAfford?'#a8c8ff':'var(--muted)'}">${maxed?'MAX':cost+' ◆'}</div>
